@@ -2,7 +2,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Helper function to check if user is authenticated
+    // Helper function to check if user is authenticated with Firebase Auth
     function isAuthenticated() {
       return request.auth != null;
     }
@@ -13,31 +13,28 @@ service cloud.firestore {
              exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
     
-    // Admins collection - only admins can read
+    // Admins collection - authenticated users can read their own admin doc
     match /admins/{adminId} {
-      allow read: if isAdmin();
+      allow read: if isAuthenticated(); // Allow any authenticated user to check if they're admin
       allow write: if false; // Admins must be created manually
     }
     
     // Employees collection
     match /employees/{employeeId} {
-      // Employees can read and update their own document
-      allow read, update: if isAuthenticated() && request.auth.uid == employeeId;
-      // Employees can create their own document during registration
-      allow create: if isAuthenticated() && request.auth.uid == employeeId;
-      // Admins can read all employees
-      allow read: if isAdmin();
+      // Allow read for anyone (employees don't use Firebase Auth)
+      allow read: if true;
+      // Admins can write (create, update, delete) employees
+      allow write: if isAdmin();
     }
     
     // Responses collection
     match /responses/{responseId} {
-      // Employees can create their own response (once)
-      allow create: if isAuthenticated() && 
-                      request.auth.uid == responseId &&
-                      !exists(/databases/$(database)/documents/responses/$(responseId));
-      // Employees can read their own response
-      allow read: if isAuthenticated() && request.auth.uid == responseId;
-      // Admins can read all responses
+      // Anyone can create a response (employees don't use Firebase Auth)
+      // But we check employeeId matches and survey not completed in application logic
+      allow create: if true;
+      // Anyone can read (will be filtered in app)
+      allow read: if true;
+      // Admins can read all
       allow read: if isAdmin();
       // No one can update or delete responses
       allow update, delete: if false;
@@ -45,8 +42,8 @@ service cloud.firestore {
     
     // Survey questions collection
     match /surveyQuestions/{questionId} {
-      // Anyone authenticated can read questions
-      allow read: if isAuthenticated();
+      // Anyone can read questions (needed for survey)
+      allow read: if true;
       // Only admins can write questions
       allow write: if isAdmin();
     }

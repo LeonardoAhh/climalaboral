@@ -10,6 +10,7 @@ import CategoryChart from '../components/admin/CategoryChart';
 import ResponsesTable from '../components/admin/ResponsesTable';
 import QuestionEditor from '../components/admin/QuestionEditor';
 import EmployeeManager from '../components/admin/EmployeeManager';
+import DepartmentAnalytics from '../components/admin/DepartmentAnalytics';
 import '../styles/pages/AdminDashboard.css';
 
 const AdminDashboard = () => {
@@ -315,6 +316,9 @@ const AdminDashboard = () => {
                                 </div>
                             </div>
                         </div>
+
+                        {/* Department and Area Analytics */}
+                        <DepartmentAnalytics employees={employees} responses={responses} />
                     </motion.div>
                 )}
 
