@@ -157,30 +157,10 @@ const DepartmentAnalytics = ({ employees, responses }) => {
 
                             {expandedDept === dept.name && (
                                 <div className="metrics-row">
-                                    <div className="metric">
+                                    <div className="metric metric-single">
                                         <span className="metric-label">Participación</span>
-                                        <span className="metric-value">{dept.participationRate}%</span>
-                                        <span className="metric-detail">{dept.completed}/{dept.total}</span>
-                                    </div>
-
-                                    <div className="metric">
-                                        <span className="metric-label">Mejor Categoría</span>
-                                        <span className="metric-value category-name">
-                                            {dept.bestCategory ? categoryInfo[dept.bestCategory[0]]?.name : 'N/A'}
-                                        </span>
-                                        <span className="metric-detail score-high">
-                                            {dept.bestCategory ? dept.bestCategory[1].toFixed(2) : '-'}
-                                        </span>
-                                    </div>
-
-                                    <div className="metric">
-                                        <span className="metric-label">Oportunidad</span>
-                                        <span className="metric-value category-name">
-                                            {dept.worstCategory ? categoryInfo[dept.worstCategory[0]]?.name : 'N/A'}
-                                        </span>
-                                        <span className="metric-detail score-low">
-                                            {dept.worstCategory ? dept.worstCategory[1].toFixed(2) : '-'}
-                                        </span>
+                                        <span className="metric-value metric-value-large">{dept.participationRate}%</span>
+                                        <span className="metric-detail">{dept.completed} de {dept.total} empleados completaron la encuesta</span>
                                     </div>
                                 </div>
                             )}

@@ -169,7 +169,9 @@ const EmployeeManager = ({ employees, onAdd, onEdit, onDelete }) => {
                                 <td>{employee.area}</td>
                                 <td>
                                     {employee.surveyCompleted ? (
-                                        <span className="badge badge-success">Completada</span>
+                                        <span className="badge badge-success">✓ Completada</span>
+                                    ) : employee.hasProgress ? (
+                                        <span className="badge badge-warning">⏳ En progreso</span>
                                     ) : (
                                         <span className="badge badge-pending">Pendiente</span>
                                     )}

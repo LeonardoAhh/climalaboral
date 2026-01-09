@@ -43,7 +43,21 @@ const AdminDashboard = () => {
                 id: doc.id,
                 ...doc.data()
             }));
-            setEmployees(employeesData);
+
+            // Load survey progress
+            const progressSnapshot = await getDocs(collection(db, 'surveyProgress'));
+            const progressMap = {};
+            progressSnapshot.docs.forEach(doc => {
+                progressMap[doc.id] = true;
+            });
+
+            // Map progress to employees
+            const employeesWithProgress = employeesData.map(emp => ({
+                ...emp,
+                hasProgress: !emp.surveyCompleted && progressMap[emp.id]
+            }));
+
+            setEmployees(employeesWithProgress);
 
             // Load questions
             const questionsSnapshot = await getDocs(collection(db, 'surveyQuestions'));
