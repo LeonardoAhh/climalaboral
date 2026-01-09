@@ -2,6 +2,26 @@
 
 Una aplicación web progresiva (PWA) moderna para realizar encuestas de clima laboral con autenticación de empleados, sistema de una sola respuesta, y dashboard administrativo con KPIs y métricas en tiempo real.
 
+## 🌐 Deployment
+
+### GitHub + Vercel (Recomendado)
+
+**Repositorio listo para GitHub y deployment en Vercel.** El proyecto ya está inicializado con Git.
+
+🚀 **Quick Start**: Ver [QUICKSTART.md](QUICKSTART.md) para instrucciones rápidas.
+
+📖 **Guía Completa**: Ver [DEPLOYMENT.md](DEPLOYMENT.md) para deployment detallado.
+
+**URL de producción**: Una vez desplegado, tu app estará en `https://clima-laboral-pwa.vercel.app`
+
+### Firebase Hosting (Alternativa)
+
+También puedes desplegar en Firebase Hosting:
+```bash
+npm run build
+firebase deploy
+```
+
 ## 🚀 Características
 
 ### Para Empleados
