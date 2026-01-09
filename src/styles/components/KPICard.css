@@ -1,26 +1,58 @@
 .kpi-card {
     background: white;
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-2xl);
     padding: var(--spacing-xl);
-    box-shadow: var(--shadow-md);
-    transition: all var(--transition-base);
-    border-left: 4px solid;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
 }
 
-.kpi-card-primary {
-    border-color: var(--primary);
+.kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--card-color), var(--card-color-light));
+    opacity: 0;
+    transition: opacity var(--transition-base);
 }
 
-.kpi-card-secondary {
-    border-color: var(--secondary);
+.kpi-card:hover::before {
+    opacity: 1;
 }
 
-.kpi-card-success {
-    border-color: var(--success);
+.kpi-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
 }
 
-.kpi-card-warning {
-    border-color: var(--warning);
+/* Color variants with gradients */
+.kpi-card.primary {
+    --card-color: #6366f1;
+    --card-color-light: #8b5cf6;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+}
+
+.kpi-card.secondary {
+    --card-color: #10b981;
+    --card-color-light: #34d399;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(52, 211, 153, 0.05) 100%);
+}
+
+.kpi-card.success {
+    --card-color: #22c55e;
+    --card-color-light: #4ade80;
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(74, 222, 128, 0.05) 100%);
+}
+
+.kpi-card.warning {
+    --card-color: #f59e0b;
+    --card-color-light: #fbbf24;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.05) 0%, rgba(251, 191, 36, 0.05) 100%);
 }
 
 .kpi-header {
@@ -33,10 +65,33 @@
 .kpi-icon {
     width: 56px;
     height: 56px;
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-xl);
     display: flex;
     align-items: center;
     justify-content: center;
+    background: linear-gradient(135deg, var(--card-color), var(--card-color-light));
+    color: white;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    animation: float 3s ease-in-out infinite;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+.kpi-card:hover .kpi-icon {
+    transform: scale(1.1) rotate(5deg);
+    animation-play-state: paused;
 }
 
 .kpi-icon svg {
