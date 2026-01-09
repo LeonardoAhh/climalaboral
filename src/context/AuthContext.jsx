@@ -34,22 +34,16 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // Check if user is admin
+                // Only check if user is admin (employees don't use Firebase Auth)
                 const adminDoc = await getDoc(doc(db, 'admins', user.uid));
                 if (adminDoc.exists()) {
                     setUserType('admin');
                     setCurrentUser({ ...user, isAdmin: true });
                 } else {
-                    // Check if user is employee
-                    const employeeDoc = await getDoc(doc(db, 'employees', user.uid));
-                    if (employeeDoc.exists()) {
-                        setUserType('employee');
-                        setCurrentUser({
-                            ...user,
-                            isAdmin: false,
-                            employeeData: employeeDoc.data()
-                        });
-                    }
+                    // Not an admin, sign out
+                    await firebaseSignOut(auth);
+                    setCurrentUser(null);
+                    setUserType(null);
                 }
             } else {
                 setCurrentUser(null);
@@ -64,48 +58,52 @@ export const AuthProvider = ({ children }) => {
     // Employee login with ID, Name, and CURP
     const loginEmployee = async (employeeId, name, curp) => {
         try {
-            // Check if employee exists in Firestore
-            const employeesRef = collection(db, 'employees');
-            const q = query(employeesRef, where('employeeId', '==', employeeId));
-            const querySnapshot = await getDocs(q);
+            // Look for employee by document ID
+            const employeeDocRef = doc(db, 'employees', `emp_${employeeId}`);
+            const employeeSnap = await getDoc(employeeDocRef);
 
-            if (querySnapshot.empty) {
-                // Create new employee
-                const email = `employee${employeeId}@climalaboral.local`;
-                const userCredential = await createUserWithEmailAndPassword(auth, email, curp);
+            if (!employeeSnap.exists()) {
+                throw new Error('Empleado no encontrado. Verifica tu ID.');
+            }
 
-                // Store employee data
-                await setDoc(doc(db, 'employees', userCredential.user.uid), {
-                    employeeId,
-                    name,
-                    curp, // In production, hash this!
-                    surveyCompleted: false,
-                    completedAt: null,
-                    createdAt: new Date()
-                });
+            const employeeData = employeeSnap.data();
 
-                setUserType('employee');
-                return { success: true, user: userCredential.user };
-            } else {
-                // Employee exists, try to login
-                const employeeDoc = querySnapshot.docs[0];
-                const employeeData = employeeDoc.data();
+            // Verify CURP matches
+            if (employeeData.curp.toUpperCase() !== curp.toUpperCase()) {
+                throw new Error('CURP incorrecta');
+            }
 
-                // Verify CURP matches
-                if (employeeData.curp !== curp) {
-                    throw new Error('CURP incorrecta');
-                }
+            // Verify name matches (case insensitive, allowing partial match)
+            const normalizedInputName = name.trim().toUpperCase();
+            const normalizedEmployeeName = employeeData.name.toUpperCase();
 
-                const email = `employee${employeeId}@climalaboral.local`;
-                const userCredential = await signInWithEmailAndPassword(auth, email, curp);
+            if (!normalizedEmployeeName.includes(normalizedInputName) &&
+                !normalizedInputName.includes(normalizedEmployeeName)) {
+                throw new Error('El nombre no coincide con el registrado');
+            }
 
-                setUserType('employee');
+            // Check if survey is already completed
+            if (employeeData.surveyCompleted) {
                 return {
                     success: true,
-                    user: userCredential.user,
-                    surveyCompleted: employeeData.surveyCompleted
+                    surveyCompleted: true,
+                    employeeData: employeeData
                 };
             }
+
+            // Create session for employee (no Firebase Auth needed for employees)
+            setUserType('employee');
+            setCurrentUser({
+                uid: employeeSnap.id,
+                isAdmin: false,
+                employeeData: employeeData
+            });
+
+            return {
+                success: true,
+                surveyCompleted: false,
+                employeeData: employeeData
+            };
         } catch (error) {
             console.error('Error logging in employee:', error);
             throw error;
@@ -145,9 +143,9 @@ export const AuthProvider = ({ children }) => {
     };
 
     // Check if employee has completed survey
-    const checkSurveyStatus = async (userId) => {
+    const checkSurveyStatus = async (employeeDocId) => {
         try {
-            const employeeDoc = await getDoc(doc(db, 'employees', userId));
+            const employeeDoc = await getDoc(doc(db, 'employees', employeeDocId));
             if (employeeDoc.exists()) {
                 return employeeDoc.data().surveyCompleted || false;
             }

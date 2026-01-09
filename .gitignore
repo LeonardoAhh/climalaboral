@@ -43,3 +43,7 @@ ui-debug.log
 
 # PWA
 dev-dist/
+
+# Sensitive data - DO NOT COMMIT
+empleados.json
+import-log.txt
