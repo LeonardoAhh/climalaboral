@@ -55,6 +55,7 @@
     right: 0;
     height: 6px;
     transition: height var(--transition-base);
+    z-index: 0;
 }
 
 .employee-card::before {
@@ -76,6 +77,8 @@
 }
 
 .card-icon {
+    position: relative;
+    z-index: 1;
     width: 64px;
     height: 64px;
     margin-bottom: var(--spacing-lg);
@@ -106,12 +109,16 @@
 }
 
 .home-card h2 {
+    position: relative;
+    z-index: 1;
     font-size: 1.75rem;
     font-weight: 700;
     margin-bottom: var(--spacing-sm);
 }
 
 .home-card p {
+    position: relative;
+    z-index: 1;
     color: var(--gray-600);
     font-size: 1rem;
     margin-bottom: var(--spacing-lg);
@@ -120,6 +127,7 @@
 
 .card-arrow {
     position: absolute;
+    z-index: 1;
     bottom: var(--spacing-xl);
     right: var(--spacing-xl);
     font-size: 2rem;
