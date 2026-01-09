@@ -29,8 +29,19 @@
 .header-content {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: var(--spacing-lg);
+    align-items: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+}
+
+.dashboard-logo {
+    max-width: 120px;
+    height: auto;
 }
 
 .dashboard-header h1 {
@@ -41,7 +52,7 @@
 }
 
 .dashboard-subtitle {
-    color: var(--gray-600);
+    color: rgba(255, 255, 255, 0.9);
     font-size: 1rem;
     margin: 0;
 }

@@ -47,5 +47,13 @@ service cloud.firestore {
       // Only admins can write questions
       allow write: if isAdmin();
     }
+    
+    // Survey progress collection
+    match /surveyProgress/{employeeId} {
+      // Anyone can read and write their own progress
+      allow read, write: if true;
+      // Admins can read all progress
+      allow read: if isAdmin();
+    }
   }
 }

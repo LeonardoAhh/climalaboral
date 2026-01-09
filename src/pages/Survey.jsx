@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { doc, setDoc, getDoc, collection, getDocs } from 'firebase/firestore';
+import { doc, setDoc, getDoc, collection, getDocs, updateDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { useAuth } from '../context/AuthContext';
 import { defaultSurveyQuestions, scaleLabels, categoryInfo } from '../data/surveyQuestions';
@@ -26,7 +26,15 @@ const Survey = () => {
     useEffect(() => {
         loadQuestions();
         checkSurveyStatus();
+        loadProgress();
     }, []);
+
+    // Auto-save progress
+    useEffect(() => {
+        if (Object.keys(answers).length > 0 && currentUser?.uid) {
+            saveProgress();
+        }
+    }, [answers, currentCategory]);
 
     const loadQuestions = async () => {
         try {
@@ -59,6 +67,31 @@ const Survey = () => {
             }
         } catch (err) {
             console.error('Error checking survey status:', err);
+        }
+    };
+
+    const loadProgress = async () => {
+        try {
+            const progressDoc = await getDoc(doc(db, 'surveyProgress', currentUser.uid));
+            if (progressDoc.exists()) {
+                const data = progressDoc.data();
+                setAnswers(data.answers || {});
+                setCurrentCategory(data.currentCategory || 0);
+            }
+        } catch (err) {
+            console.error('Error loading progress:', err);
+        }
+    };
+
+    const saveProgress = async () => {
+        try {
+            await setDoc(doc(db, 'surveyProgress', currentUser.uid), {
+                answers,
+                currentCategory,
+                lastUpdated: new Date()
+            });
+        } catch (err) {
+            console.error('Error saving progress:', err);
         }
     };
 
@@ -188,11 +221,14 @@ const Survey = () => {
             <div className="survey-header">
                 <div className="container">
                     <div className="survey-header-content">
-                        <div>
-                            <h1>Encuesta de Clima Laboral</h1>
-                            <p className="survey-subtitle">
-                                Sección {currentCategory + 1} de {categories.length}: {categoryData?.name}
-                            </p>
+                        <div className="header-left-survey">
+                            <img src="/logo-vinoplastic.png" alt="Vino Plastic" className="survey-logo" />
+                            <div>
+                                <h1>Encuesta de Clima Laboral</h1>
+                                <p className="survey-subtitle">
+                                    Sección {currentCategory + 1} de {categories.length}: {categoryData?.name}
+                                </p>
+                            </div>
                         </div>
                         <button onClick={handleLogout} className="btn btn-outline btn-sm">
                             Salir

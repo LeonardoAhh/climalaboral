@@ -17,6 +17,7 @@ const Home = () => {
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.2, duration: 0.6 }}
                 >
+                    <img src="/logo-vinoplastic.png" alt="Vino Plastic" className="home-logo" />
                     <h1 className="home-title">Clima Laboral</h1>
                     <p className="home-subtitle">Selecciona tu perfil para continuar</p>
                 </motion.div>

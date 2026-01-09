@@ -17,6 +17,13 @@
     margin-bottom: var(--spacing-3xl);
 }
 
+.home-logo {
+    max-width: 280px;
+    height: auto;
+    margin-bottom: var(--spacing-xl);
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
+}
+
 .home-title {
     font-size: 3rem;
     font-weight: 300;

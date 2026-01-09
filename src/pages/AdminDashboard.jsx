@@ -208,11 +208,14 @@ const AdminDashboard = () => {
             <div className="dashboard-header">
                 <div className="container">
                     <div className="header-content">
-                        <div>
-                            <h1>Panel de Administración</h1>
-                            <p className="dashboard-subtitle">
-                                Resultados de la Encuesta de Clima Laboral
-                            </p>
+                        <div className="header-left">
+                            <img src="/logo-vinoplastic.png" alt="Vino Plastic" className="dashboard-logo" />
+                            <div>
+                                <h1>Panel de Administración</h1>
+                                <p className="dashboard-subtitle">
+                                    Resultados de la Encuesta de Clima Laboral
+                                </p>
+                            </div>
                         </div>
                         <button onClick={handleLogout} className="btn btn-outline btn-sm">
                             Cerrar Sesión
