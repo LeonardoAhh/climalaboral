@@ -11,6 +11,12 @@
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--gray-900);
+    margin-bottom: var(--spacing-sm);
+}
+
+.section-subtitle {
+    font-size: 0.875rem;
+    color: var(--gray-600);
     margin-bottom: var(--spacing-xl);
 }
 
@@ -28,11 +34,13 @@
     box-shadow: var(--shadow-md);
     border: 2px solid var(--gray-100);
     transition: all var(--transition-base);
+    cursor: pointer;
 }
 
 .analytics-card:hover {
     box-shadow: var(--shadow-lg);
     border-color: var(--primary);
+    transform: translateY(-2px);
 }
 
 .card-header-dept {
@@ -44,11 +52,31 @@
     border-bottom: 2px solid var(--gray-100);
 }
 
+.card-header-dept>div {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
 .card-header-dept h4 {
     font-size: 1.125rem;
     font-weight: 700;
     color: var(--gray-900);
     margin: 0;
+}
+
+.expand-icon {
+    transition: transform var(--transition-base);
+    color: var(--primary);
+    flex-shrink: 0;
+}
+
+.expand-icon.rotated {
+    transform: rotate(180deg);
+}
+
+.analytics-card.expanded .card-header-dept {
+    margin-bottom: var(--spacing-xl);
 }
 
 .areas-count {
@@ -58,6 +86,7 @@
     padding: 0.25rem 0.75rem;
     border-radius: var(--radius-full);
     font-weight: 600;
+    width: fit-content;
 }
 
 .metrics-row {
