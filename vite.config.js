@@ -82,5 +82,19 @@ export default defineConfig({
         ]
       }
     })
-  ]
+  ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'firebase-vendor': ['firebase/app', 'firebase/auth', 'firebase/firestore'],
+          'chart-vendor': ['chart.js', 'react-chartjs-2'],
+          'animation-vendor': ['framer-motion']
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000
+  }
 });
+
