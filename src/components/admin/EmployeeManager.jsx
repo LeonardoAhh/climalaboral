@@ -7,6 +7,7 @@ const EmployeeManager = ({ employees, onAdd, onEdit, onDelete }) => {
     const [filterDepartment, setFilterDepartment] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [editingEmployee, setEditingEmployee] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
     const [formData, setFormData] = useState({
         employeeId: '',
         name: '',
@@ -14,6 +15,8 @@ const EmployeeManager = ({ employees, onAdd, onEdit, onDelete }) => {
         department: '',
         area: ''
     });
+
+    const ITEMS_PER_PAGE = 10;
 
     // Get unique departments
     const departments = [...new Set(employees.map(emp => emp.department))].sort();
@@ -26,6 +29,31 @@ const EmployeeManager = ({ employees, onAdd, onEdit, onDelete }) => {
         const matchesDepartment = !filterDepartment || emp.department === filterDepartment;
         return matchesSearch && matchesDepartment;
     }).sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically by name
+
+    // Pagination calculations
+    const totalPages = Math.ceil(filteredEmployees.length / ITEMS_PER_PAGE);
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const paginatedEmployees = filteredEmployees.slice(startIndex, endIndex);
+
+    // Reset to page 1 when filters change
+    const handleSearchChange = (value) => {
+        setSearchTerm(value);
+        setCurrentPage(1);
+    };
+
+    const handleDepartmentChange = (value) => {
+        setFilterDepartment(value);
+        setCurrentPage(1);
+    };
+
+    const handlePreviousPage = () => {
+        setCurrentPage(prev => Math.max(prev - 1, 1));
+    };
+
+    const handleNextPage = () => {
+        setCurrentPage(prev => Math.min(prev + 1, totalPages));
+    };
 
     const handleOpenModal = (employee = null) => {
         if (employee) {
@@ -101,14 +129,14 @@ const EmployeeManager = ({ employees, onAdd, onEdit, onDelete }) => {
                         type="text"
                         placeholder="Buscar por nombre, ID o CURP..."
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onChange={(e) => handleSearchChange(e.target.value)}
                         className="search-input"
                     />
                 </div>
 
                 <select
                     value={filterDepartment}
-                    onChange={(e) => setFilterDepartment(e.target.value)}
+                    onChange={(e) => handleDepartmentChange(e.target.value)}
                     className="filter-select"
                 >
                     <option value="">Todos los departamentos</option>
@@ -132,7 +160,7 @@ const EmployeeManager = ({ employees, onAdd, onEdit, onDelete }) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredEmployees.map(employee => (
+                        {paginatedEmployees.map(employee => (
                             <tr key={employee.id}>
                                 <td>{employee.employeeId}</td>
                                 <td>{employee.name}</td>
@@ -187,6 +215,42 @@ const EmployeeManager = ({ employees, onAdd, onEdit, onDelete }) => {
             <div className="manager-footer">
                 <p>Total: {filteredEmployees.length} de {employees.length} empleados</p>
             </div>
+
+            {filteredEmployees.length > 0 && (
+                <div className="pagination-controls">
+                    <div className="pagination-info">
+                        <p>
+                            Mostrando {startIndex + 1}-{Math.min(endIndex, filteredEmployees.length)} de {filteredEmployees.length} empleados
+                            {filteredEmployees.length < employees.length && ` (${employees.length} totales)`}
+                        </p>
+                    </div>
+                    <div className="pagination-buttons">
+                        <button
+                            onClick={handlePreviousPage}
+                            disabled={currentPage === 1}
+                            className="btn btn-outline btn-sm"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: 16, height: 16 }}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                            </svg>
+                            Anterior
+                        </button>
+                        <span className="page-indicator">
+                            Página {currentPage} de {totalPages}
+                        </span>
+                        <button
+                            onClick={handleNextPage}
+                            disabled={currentPage === totalPages}
+                            className="btn btn-outline btn-sm"
+                        >
+                            Siguiente
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: 16, height: 16 }}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Modal */}
             <AnimatePresence>
