@@ -1,0 +1,195 @@
+.home-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl);
+}
+
+.home-content {
+    max-width: 900px;
+    width: 100%;
+}
+
+.home-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    text-align: center;
+    color: white;
+    margin-bottom: var(--spacing-md);
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.home-subtitle {
+    font-size: 1.25rem;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.95);
+    margin-bottom: var(--spacing-3xl);
+    font-weight: 300;
+}
+
+.home-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-3xl);
+}
+
+.home-card {
+    position: relative;
+    background: white;
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-2xl);
+    text-decoration: none;
+    color: var(--gray-900);
+    transition: all var(--transition-base);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+.home-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    transition: height var(--transition-base);
+}
+
+.employee-card::before {
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+}
+
+.admin-card::before {
+    background: linear-gradient(90deg, var(--secondary) 0%, #34d399 100%);
+}
+
+.home-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.home-card:hover::before {
+    height: 100%;
+    opacity: 0.05;
+}
+
+.card-icon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-xl);
+    transition: all var(--transition-base);
+}
+
+.employee-card .card-icon {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.2) 100%);
+    color: var(--primary);
+}
+
+.admin-card .card-icon {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.2) 100%);
+    color: var(--secondary);
+}
+
+.card-icon svg {
+    width: 36px;
+    height: 36px;
+}
+
+.home-card:hover .card-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.home-card h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: var(--spacing-sm);
+}
+
+.home-card p {
+    color: var(--gray-600);
+    font-size: 1rem;
+    margin-bottom: var(--spacing-lg);
+    line-height: 1.6;
+}
+
+.card-arrow {
+    position: absolute;
+    bottom: var(--spacing-xl);
+    right: var(--spacing-xl);
+    font-size: 2rem;
+    font-weight: 700;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all var(--transition-base);
+}
+
+.employee-card .card-arrow {
+    color: var(--primary);
+}
+
+.admin-card .card-arrow {
+    color: var(--secondary);
+}
+
+.home-card:hover .card-arrow {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.home-footer {
+    text-align: center;
+}
+
+.footer-text {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    padding: var(--spacing-md) var(--spacing-xl);
+    border-radius: var(--radius-full);
+    color: white;
+    font-size: 0.95rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.footer-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .home-title {
+        font-size: 2.5rem;
+    }
+
+    .home-subtitle {
+        font-size: 1.1rem;
+    }
+
+    .home-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-text {
+        font-size: 0.875rem;
+        padding: var(--spacing-sm) var(--spacing-lg);
+    }
+}
+
+@media (max-width: 480px) {
+    .home-title {
+        font-size: 2rem;
+    }
+
+    .home-card {
+        padding: var(--spacing-xl);
+    }
+}

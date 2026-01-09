@@ -1,0 +1,132 @@
+.question-editor-container {
+    width: 100%;
+}
+
+.card-subtitle {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+    margin-top: var(--spacing-xs);
+}
+
+.editor-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.categories-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2xl);
+}
+
+.category-section {
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    background: var(--gray-50);
+}
+
+.category-header {
+    display: flex;
+    gap: var(--spacing-lg);
+    align-items: flex-start;
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 2px solid var(--gray-200);
+}
+
+.category-badge {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: white;
+    flex-shrink: 0;
+}
+
+.category-header h4 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: var(--spacing-xs);
+}
+
+.category-header p {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.questions-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.question-edit-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    border: 2px solid var(--gray-200);
+    transition: all var(--transition-base);
+}
+
+.question-edit-card:hover {
+    border-color: var(--primary-light);
+    box-shadow: var(--shadow-md);
+}
+
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.question-number {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--primary);
+}
+
+.question-id {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gray-500);
+    font-family: 'Courier New', monospace;
+}
+
+.question-edit-card textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+@media (max-width: 768px) {
+    .editor-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .editor-actions .btn {
+        width: 100%;
+    }
+
+    .category-section {
+        padding: var(--spacing-lg);
+    }
+
+    .category-header {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+
+    .category-header h4 {
+        font-size: 1.25rem;
+    }
+}

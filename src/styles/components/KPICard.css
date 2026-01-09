@@ -1,0 +1,121 @@
+.kpi-card {
+    background: white;
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+    border-left: 4px solid;
+}
+
+.kpi-card-primary {
+    border-color: var(--primary);
+}
+
+.kpi-card-secondary {
+    border-color: var(--secondary);
+}
+
+.kpi-card-success {
+    border-color: var(--success);
+}
+
+.kpi-card-warning {
+    border-color: var(--warning);
+}
+
+.kpi-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-lg);
+}
+
+.kpi-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.kpi-icon svg {
+    width: 28px;
+    height: 28px;
+}
+
+.kpi-icon-primary {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.2) 100%);
+    color: var(--primary);
+}
+
+.kpi-icon-secondary {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.2) 100%);
+    color: var(--secondary);
+}
+
+.kpi-icon-success {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.2) 100%);
+    color: var(--success);
+}
+
+.kpi-icon-warning {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.2) 100%);
+    color: var(--warning);
+}
+
+.trend-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.trend-up {
+    color: var(--success);
+}
+
+.trend-down {
+    color: var(--danger);
+}
+
+.kpi-content {
+    margin-top: var(--spacing-md);
+}
+
+.kpi-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: var(--spacing-sm);
+}
+
+.kpi-value {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: var(--gray-900);
+    margin-bottom: var(--spacing-xs);
+    line-height: 1;
+}
+
+.kpi-subtitle {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .kpi-value {
+        font-size: 1.875rem;
+    }
+
+    .kpi-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .kpi-icon svg {
+        width: 24px;
+        height: 24px;
+    }
+}
