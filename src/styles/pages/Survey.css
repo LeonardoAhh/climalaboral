@@ -188,12 +188,27 @@
         padding: var(--spacing-lg) 0;
     }
 
+    .survey-logo {
+        max-width: 70px;
+    }
+
     .survey-header h1 {
         font-size: 1.5rem;
     }
 
+    .survey-subtitle {
+        font-size: 0.875rem;
+        color: var(--gray-600);
+        /* Better contrast on mobile */
+    }
+
     .survey-header-content {
         flex-direction: column;
+        gap: var(--spacing-md);
+        align-items: flex-start;
+    }
+
+    .header-left-survey {
         gap: var(--spacing-md);
     }
 
@@ -233,6 +248,8 @@
         justify-content: flex-start;
         gap: var(--spacing-md);
         min-width: 100%;
+        min-height: 48px;
+        /* Better touch target */
     }
 
     .radio-value {
@@ -254,6 +271,10 @@
 }
 
 @media (max-width: 480px) {
+    .survey-logo {
+        max-width: 60px;
+    }
+
     .survey-header h1 {
         font-size: 1.25rem;
     }
