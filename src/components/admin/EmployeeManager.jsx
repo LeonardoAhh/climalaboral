@@ -25,7 +25,7 @@ const EmployeeManager = ({ employees, onAdd, onEdit, onDelete }) => {
             emp.curp.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesDepartment = !filterDepartment || emp.department === filterDepartment;
         return matchesSearch && matchesDepartment;
-    });
+    }).sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically by name
 
     const handleOpenModal = (employee = null) => {
         if (employee) {

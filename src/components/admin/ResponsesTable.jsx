@@ -5,8 +5,8 @@ import '../../styles/components/ResponsesTable.css';
 
 const ResponsesTable = ({ responses }) => {
     const [searchTerm, setSearchTerm] = useState('');
-    const [sortBy, setSortBy] = useState('date'); // date, score, name
-    const [sortOrder, setSortOrder] = useState('desc'); // asc, desc
+    const [sortBy, setSortBy] = useState('name'); // date, score, name - default to name for alphabetical
+    const [sortOrder, setSortOrder] = useState('asc'); // asc, desc - ascending for alphabetical
 
     const filteredResponses = responses.filter(response =>
         response.employeeName.toLowerCase().includes(searchTerm.toLowerCase()) ||

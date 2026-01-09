@@ -87,7 +87,7 @@ const DepartmentAnalytics = ({ employees, responses }) => {
                 worstCategory: sortedCategories[sortedCategories.length - 1],
                 areasCount: stats.areas.size
             };
-        }).sort((a, b) => b.completed - a.completed);
+        }).sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically by name
 
         // Calculate metrics for each area
         const areaMetrics = Object.entries(areaStats).map(([name, stats]) => {
@@ -118,7 +118,7 @@ const DepartmentAnalytics = ({ employees, responses }) => {
                 bestCategory: sortedCategories[0],
                 worstCategory: sortedCategories[sortedCategories.length - 1]
             };
-        }).sort((a, b) => b.completed - a.completed);
+        }).sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically by name
 
         return { departmentMetrics, areaMetrics };
     }, [employees, responses]);
