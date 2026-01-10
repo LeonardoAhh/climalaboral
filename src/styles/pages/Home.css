@@ -1,207 +1,147 @@
+/* ========================================
+   HOME PAGE - Minimalist Modern Design
+   ======================================== */
+
 .home-container {
     min-height: 100vh;
-    background: linear-gradient(135deg, #F0EBE1 0%, #E1D9C9 100%);
+    background: var(--gradient-neutral);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--spacing-xl);
-    position: relative;
+    padding: var(--spacing-lg);
 }
 
 .home-content {
-    max-width: 700px;
+    text-align: center;
+    max-width: 600px;
     width: 100%;
 }
 
-.home-header {
-    text-align: center;
-    margin-bottom: var(--spacing-3xl);
-}
-
 .home-logo {
-    max-width: 280px;
+    max-width: 200px;
     height: auto;
-    margin-bottom: var(--spacing-xl);
-    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
+    margin-bottom: var(--spacing-lg);
 }
 
 .home-title {
-    font-size: 3rem;
-    font-weight: 300;
+    font-size: var(--font-size-3xl);
+    font-weight: 800;
     color: var(--gray-900);
     margin-bottom: var(--spacing-sm);
-    letter-spacing: -1px;
 }
 
 .home-subtitle {
-    font-size: 1.125rem;
+    font-size: var(--font-size-base);
     color: var(--gray-600);
-    font-weight: 400;
+    margin-bottom: var(--spacing-2xl);
 }
 
-.home-options {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-xl);
-    margin-bottom: var(--spacing-3xl);
+.home-cards {
+    display: flex;
+    gap: var(--spacing-lg);
+    justify-content: center;
 }
 
-.option-card {
-    position: relative;
+.home-card {
+    flex: 1;
+    max-width: 260px;
     background: white;
-    border: 2px solid var(--gray-200);
-    border-radius: var(--radius-xl);
-    padding: var(--spacing-3xl) var(--spacing-xl);
-    text-decoration: none;
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-xl);
     text-align: center;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
     cursor: pointer;
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-card);
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    overflow: hidden;
 }
 
-.option-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+.home-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-primary);
+    transform: scaleX(0);
+    transition: transform var(--transition-base);
 }
 
-.employee-option {
-    border-color: var(--gray-200);
+.home-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
 }
 
-.employee-option:hover {
-    border-color: var(--primary);
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.02) 0%, rgba(99, 102, 241, 0.05) 100%);
+.home-card:hover::before {
+    transform: scaleX(1);
 }
 
-.admin-option {
-    border-color: var(--gray-200);
-}
-
-.admin-option:hover {
-    border-color: var(--secondary);
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.02) 0%, rgba(16, 185, 129, 0.05) 100%);
-}
-
-.option-icon {
-    width: 64px;
-    height: 64px;
-    margin: 0 auto var(--spacing-lg);
+.home-card-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto var(--spacing-md);
+    border-radius: var(--radius-xl);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-}
-
-.employee-option .option-icon {
-    background: var(--gray-100);
-    color: var(--primary);
-}
-
-.employee-option:hover .option-icon {
-    background: var(--primary);
+    background: var(--gradient-primary);
     color: white;
-    transform: scale(1.1);
 }
 
-.admin-option .option-icon {
-    background: var(--gray-100);
-    color: var(--secondary);
+.home-card-icon.secondary {
+    background: var(--gradient-secondary);
 }
 
-.admin-option:hover .option-icon {
-    background: var(--secondary);
-    color: white;
-    transform: scale(1.1);
+.home-card-icon svg {
+    width: 28px;
+    height: 28px;
 }
 
-.option-icon svg {
-    width: 32px;
-    height: 32px;
-}
-
-.option-card h2 {
-    font-size: 1.5rem;
-    font-weight: 600;
+.home-card-title {
+    font-size: var(--font-size-lg);
+    font-weight: 700;
     color: var(--gray-900);
     margin-bottom: var(--spacing-xs);
 }
 
-.option-card p {
-    font-size: 0.9375rem;
-    color: var(--gray-600);
-    font-weight: 400;
-    margin: 0;
-}
-
-.home-footer {
-    text-align: center;
-}
-
-.home-footer p {
-    font-size: 0.875rem;
+.home-card-desc {
+    font-size: var(--font-size-sm);
     color: var(--gray-500);
-    font-weight: 400;
     margin: 0;
+    line-height: 1.5;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
     .home-logo {
-        max-width: 200px;
+        max-width: 160px;
     }
 
     .home-title {
-        font-size: 2.25rem;
+        font-size: var(--font-size-2xl);
     }
 
-    .home-subtitle {
-        font-size: 1rem;
+    .home-cards {
+        flex-direction: column;
+        align-items: center;
     }
 
-    .home-options {
-        grid-template-columns: 1fr;
-        gap: var(--spacing-lg);
-    }
-
-    .option-card {
-        padding: var(--spacing-2xl) var(--spacing-lg);
-    }
-
-    .option-icon {
-        width: 56px;
-        height: 56px;
-    }
-
-    .option-icon svg {
-        width: 28px;
-        height: 28px;
-    }
-
-    .option-card h2 {
-        font-size: 1.25rem;
+    .home-card {
+        max-width: 100%;
+        width: 100%;
     }
 }
 
 @media (max-width: 480px) {
     .home-container {
+        padding: var(--spacing-md);
+    }
+
+    .home-card {
         padding: var(--spacing-lg);
-    }
-
-    .home-logo {
-        max-width: 180px;
-    }
-
-    .home-title {
-        font-size: 2rem;
-    }
-
-    .option-card {
-        padding: var(--spacing-xl);
-        min-height: 120px;
-        /* Better touch target */
-    }
-
-    .home-footer p {
-        font-size: 0.8125rem;
     }
 }

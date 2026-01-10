@@ -1,49 +1,93 @@
+/* ========================================
+   EMPLOYEE MANAGER - Minimalist Modern Design
+   ======================================== */
+
 .employee-manager {
-  width: 100%;
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
 }
 
+/* Header */
 .manager-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-lg);
+  border-bottom: 2px solid var(--neutral);
 }
 
 .manager-header h3 {
-  font-size: 1.5rem;
+  font-size: var(--font-size-lg);
   font-weight: 700;
   color: var(--gray-900);
   margin: 0;
 }
 
+/* Filters */
 .manager-filters {
   display: flex;
   gap: var(--spacing-md);
-  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--neutral-light);
+  border-bottom: 1px solid var(--neutral);
+}
+
+.search-box {
+  flex: 1;
+  position: relative;
+  max-width: 320px;
+}
+
+.search-box svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  color: var(--gray-400);
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.625rem 0.75rem 0.625rem 2.5rem;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
+  transition: all var(--transition-base);
+  background: white;
+}
+
+.search-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-100);
+  outline: none;
 }
 
 .filter-select {
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: 0.625rem 2rem 0.625rem 0.75rem;
   border: 2px solid var(--gray-200);
-  border-radius: var(--radius-md);
-  font-size: 0.875rem;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
   background: white;
   cursor: pointer;
-  transition: all var(--transition-base);
-  min-width: 200px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
 }
 
 .filter-select:focus {
   border-color: var(--primary);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
+/* Table */
 .employees-table-container {
-  background: white;
-  border-radius: var(--radius-xl);
-  overflow: hidden;
-  box-shadow: var(--shadow-md);
+  overflow-x: auto;
 }
 
 .employees-table {
@@ -51,286 +95,110 @@
   border-collapse: collapse;
 }
 
-.employees-table thead {
-  background: var(--gray-50);
-}
-
 .employees-table th {
-  padding: var(--spacing-md) var(--spacing-lg);
   text-align: left;
-  font-size: 0.75rem;
-  font-weight: 700;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--gray-500);
+  background: var(--neutral-light);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--gray-700);
-  border-bottom: 2px solid var(--gray-200);
+  border-bottom: 2px solid var(--neutral);
 }
 
 .employees-table td {
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  color: var(--gray-700);
   border-bottom: 1px solid var(--gray-100);
-  font-size: 0.875rem;
-  color: var(--gray-900);
 }
 
-.employees-table tbody tr {
-  transition: background var(--transition-fast);
-}
-
-.employees-table tbody tr:hover {
-  background: var(--gray-50);
+.employees-table tr:hover td {
+  background: var(--primary-50);
 }
 
 .employees-table code {
-  font-family: 'Courier New', monospace;
+  font-size: var(--font-size-xs);
+  padding: 2px 6px;
   background: var(--gray-100);
-  padding: 0.25rem 0.5rem;
   border-radius: var(--radius-sm);
-  font-size: 0.75rem;
+  color: var(--gray-700);
 }
 
+/* Action Buttons */
 .action-buttons {
   display: flex;
   gap: var(--spacing-xs);
 }
 
-.btn-icon {
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-icon svg {
-  width: 16px;
-  height: 16px;
-}
-
-.btn-icon-primary {
-  background: rgba(99, 102, 241, 0.1);
-  color: var(--primary);
-}
-
-.btn-icon-primary:hover:not(:disabled) {
-  background: var(--primary);
-  color: white;
-}
-
-.btn-icon-danger {
-  background: rgba(239, 68, 68, 0.1);
-  color: var(--danger);
-}
-
-.btn-icon-danger:hover:not(:disabled) {
-  background: var(--danger);
-  color: white;
-}
-
-.btn-icon:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.badge {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: var(--radius-full);
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.badge-success {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-.badge-pending {
-  background: #fed7aa;
-  color: #92400e;
-}
-
+/* Footer */
 .manager-footer {
-  margin-top: var(--spacing-lg);
-  padding: var(--spacing-md);
-  text-align: center;
-  color: var(--gray-600);
-  font-size: 0.875rem;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--neutral-light);
+  border-top: 1px solid var(--neutral);
 }
 
 .manager-footer p {
+  font-size: var(--font-size-sm);
+  color: var(--gray-500);
   margin: 0;
 }
 
-/* Pagination Controls */
+/* Pagination */
 .pagination-controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
   background: white;
-  border-top: 2px solid var(--gray-100);
-  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  border-top: 1px solid var(--neutral);
 }
 
 .pagination-info p {
+  font-size: var(--font-size-sm);
+  color: var(--gray-500);
   margin: 0;
-  font-size: 0.875rem;
-  color: var(--gray-600);
 }
 
 .pagination-buttons {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
 }
 
 .page-indicator {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--gray-700);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--gray-600);
   padding: 0 var(--spacing-sm);
 }
 
-.pagination-buttons .btn {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-}
-
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: var(--spacing-xl);
-}
-
-.modal-content {
-  background: white;
-  border-radius: var(--radius-2xl);
-  max-width: 500px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: var(--shadow-lg);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-xl);
-  border-bottom: 2px solid var(--gray-100);
-}
-
-.modal-header h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--gray-900);
-  margin: 0;
-}
-
-.modal-close {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: var(--gray-100);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.modal-close svg {
-  width: 20px;
-  height: 20px;
-}
-
-.modal-close:hover {
-  background: var(--gray-200);
-}
-
-.modal-form {
-  padding: var(--spacing-xl);
-}
-
-.modal-form .form-group small {
-  display: block;
-  margin-top: var(--spacing-xs);
-  color: var(--gray-500);
-  font-size: 0.75rem;
-}
-
-.modal-actions {
-  display: flex;
-  gap: var(--spacing-md);
-  margin-top: var(--spacing-xl);
-}
-
-.modal-actions .btn {
-  flex: 1;
-}
-
+/* Responsive */
 @media (max-width: 768px) {
   .manager-header {
     flex-direction: column;
-    align-items: stretch;
     gap: var(--spacing-md);
+    align-items: stretch;
   }
 
   .manager-filters {
     flex-direction: column;
   }
 
-  .filter-select {
-    width: 100%;
+  .search-box {
+    max-width: 100%;
   }
 
-  .employees-table-container {
-    overflow-x: auto;
-  }
-
-  .employees-table {
-    min-width: 800px;
-  }
-
-  .modal-overlay {
-    padding: var(--spacing-md);
+  .employees-table th,
+  .employees-table td {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
   }
 
   .pagination-controls {
     flex-direction: column;
-    gap: var(--spacing-md);
-    align-items: stretch;
-  }
-
-  .pagination-info {
-    text-align: center;
-  }
-
-  .pagination-buttons {
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .page-indicator {
-    order: -1;
-    width: 100%;
+    gap: var(--spacing-sm);
     text-align: center;
   }
 }

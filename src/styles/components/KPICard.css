@@ -1,10 +1,13 @@
+/* ========================================
+   KPI CARD - Minimalist Modern Design
+   ======================================== */
+
 .kpi-card {
     background: white;
-    border-radius: var(--radius-2xl);
-    padding: var(--spacing-xl);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-card);
+    transition: all var(--transition-base);
     position: relative;
     overflow: hidden;
 }
@@ -14,163 +17,148 @@
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--card-color), var(--card-color-light));
+    width: 4px;
+    height: 100%;
+    background: var(--gradient-primary);
     opacity: 0;
-    transition: opacity var(--transition-base);
+    transition: opacity var(--transition-fast);
+}
+
+.kpi-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
 }
 
 .kpi-card:hover::before {
     opacity: 1;
 }
 
-.kpi-card:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+/* Color variants */
+.kpi-card.primary::before {
+    background: var(--gradient-primary);
 }
 
-/* Color variants with gradients */
-.kpi-card.primary {
-    --card-color: #1A6DA2;
-    --card-color-light: #62ADBB;
-    background: linear-gradient(135deg, rgba(26, 109, 162, 0.05) 0%, rgba(98, 173, 187, 0.05) 100%);
+.kpi-card.secondary::before {
+    background: var(--gradient-secondary);
 }
 
-.kpi-card.secondary {
-    --card-color: #62ADBB;
-    --card-color-light: #8DC5D0;
-    background: linear-gradient(135deg, rgba(98, 173, 187, 0.05) 0%, rgba(141, 197, 208, 0.05) 100%);
+.kpi-card.success::before {
+    background: linear-gradient(180deg, var(--success), var(--success-light));
 }
 
-.kpi-card.success {
-    --card-color: #10b981;
-    --card-color-light: #34d399;
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(52, 211, 153, 0.05) 100%);
-}
-
-.kpi-card.warning {
-    --card-color: #F2691A;
-    --card-color-light: #F58A4A;
-    background: linear-gradient(135deg, rgba(242, 105, 26, 0.05) 0%, rgba(245, 138, 74, 0.05) 100%);
+.kpi-card.warning::before {
+    background: var(--gradient-accent);
 }
 
 .kpi-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: var(--spacing-lg);
-}
-
-.kpi-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: var(--radius-xl);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, var(--card-color), var(--card-color-light));
-    color: white;
-    flex-shrink: 0;
-    transition: all 0.3s ease;
-    animation: float 3s ease-in-out infinite;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-}
-
-@keyframes float {
-
-    0%,
-    100% {
-        transform: translateY(0px);
-    }
-
-    50% {
-        transform: translateY(-6px);
-    }
-}
-
-.kpi-card:hover .kpi-icon {
-    transform: scale(1.1) rotate(5deg);
-    animation-play-state: paused;
-}
-
-.kpi-icon svg {
-    width: 28px;
-    height: 28px;
-}
-
-.kpi-icon-primary {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.2) 100%);
-    color: var(--primary);
-}
-
-.kpi-icon-secondary {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.2) 100%);
-    color: var(--secondary);
-}
-
-.kpi-icon-success {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.2) 100%);
-    color: var(--success);
-}
-
-.kpi-icon-warning {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.2) 100%);
-    color: var(--warning);
-}
-
-.trend-icon {
-    width: 24px;
-    height: 24px;
-}
-
-.trend-up {
-    color: var(--success);
-}
-
-.trend-down {
-    color: var(--danger);
-}
-
-.kpi-content {
-    margin-top: var(--spacing-md);
-}
-
-.kpi-title {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--gray-600);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
     margin-bottom: var(--spacing-sm);
 }
 
+.kpi-info {
+    flex: 1;
+}
+
+.kpi-title {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--gray-500);
+    margin-bottom: var(--spacing-xs);
+}
+
 .kpi-value {
-    font-size: 2.25rem;
-    font-weight: 800;
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
     color: var(--gray-900);
     margin-bottom: var(--spacing-xs);
-    line-height: 1;
 }
 
 .kpi-subtitle {
-    font-size: 0.875rem;
-    color: var(--gray-500);
-    margin: 0;
+    font-size: var(--font-size-xs);
+    color: var(--gray-400);
 }
 
+.kpi-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary-100);
+    color: var(--primary);
+    flex-shrink: 0;
+}
+
+.kpi-card.primary .kpi-icon {
+    background: var(--primary-100);
+    color: var(--primary);
+}
+
+.kpi-card.secondary .kpi-icon {
+    background: var(--secondary-100);
+    color: var(--secondary);
+}
+
+.kpi-card.success .kpi-icon {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.kpi-card.warning .kpi-icon {
+    background: rgba(242, 105, 26, 0.1);
+    color: var(--warning);
+}
+
+.kpi-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.kpi-trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px 6px;
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+}
+
+.kpi-trend.up {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.kpi-trend.down {
+    background: rgba(222, 36, 56, 0.1);
+    color: var(--danger);
+}
+
+.kpi-trend svg {
+    width: 12px;
+    height: 12px;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
+    .kpi-card {
+        padding: var(--spacing-md);
+    }
+
     .kpi-value {
-        font-size: 1.875rem;
+        font-size: var(--font-size-xl);
     }
 
     .kpi-icon {
-        width: 48px;
-        height: 48px;
+        width: 36px;
+        height: 36px;
     }
 
     .kpi-icon svg {
-        width: 24px;
-        height: 24px;
+        width: 18px;
+        height: 18px;
     }
 }

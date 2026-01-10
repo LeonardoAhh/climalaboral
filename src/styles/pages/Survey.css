@@ -1,242 +1,279 @@
+/* ========================================
+   SURVEY PAGE - Minimalist Modern Design
+   ======================================== */
+
 .survey-container {
     min-height: 100vh;
-    background: linear-gradient(135deg, #F0EBE1 0%, #E1D9C9 100%);
-    padding-bottom: var(--spacing-3xl);
+    background: var(--gradient-neutral);
+    padding-bottom: var(--spacing-2xl);
 }
 
+/* Loading */
 .survey-loading {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: var(--spacing-lg);
+    gap: var(--spacing-md);
+    background: var(--gradient-primary);
     color: white;
-    font-size: 1.125rem;
 }
 
+/* Header */
 .survey-header {
-    background: linear-gradient(135deg, #1A6DA2 0%, #62ADBB 100%);
-    box-shadow: 0 8px 32px rgba(26, 109, 162, 0.2);
-    padding: var(--spacing-xl) 0;
-    margin-bottom: var(--spacing-2xl);
+    background: var(--gradient-primary);
+    padding: var(--spacing-lg) 0;
+    margin-bottom: var(--spacing-xl);
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: var(--z-sticky);
 }
 
 .survey-header-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing-lg);
 }
 
 .header-left-survey {
     display: flex;
     align-items: center;
-    gap: var(--spacing-lg);
+    gap: var(--spacing-md);
 }
 
 .survey-logo {
-    max-width: 100px;
-    height: auto;
+    height: 36px;
+    width: auto;
+    filter: brightness(0) invert(1);
 }
 
 .survey-header h1 {
-    font-size: 2rem;
+    font-size: var(--font-size-xl);
     font-weight: 700;
     color: white;
     margin: 0;
 }
 
 .survey-subtitle {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 1rem;
+    font-size: var(--font-size-sm);
+    color: rgba(255, 255, 255, 0.8);
     margin: 0;
 }
 
+/* Progress Section */
 .progress-section {
-    margin-top: var(--spacing-lg);
+    margin-top: var(--spacing-md);
 }
 
 .progress-info {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing-sm);
-    font-size: 0.875rem;
-    color: var(--gray-700);
-    font-weight: 600;
+    margin-bottom: var(--spacing-xs);
+    font-size: var(--font-size-sm);
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .progress-percentage {
-    color: var(--primary);
     font-weight: 700;
+    color: white;
 }
 
+/* Survey Content */
 .survey-content {
-    max-width: 900px;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-lg);
 }
 
+/* Category Section */
 .category-section {
     background: white;
     border-radius: var(--radius-xl);
-    padding: var(--spacing-2xl);
-    box-shadow: var(--shadow-lg);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-card);
 }
 
 .category-header {
     display: flex;
-    gap: var(--spacing-lg);
-    align-items: flex-start;
-    margin-bottom: var(--spacing-xl);
-    padding-bottom: var(--spacing-lg);
-    border-bottom: 2px solid var(--gray-100);
+    gap: var(--spacing-md);
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 2px solid var(--neutral);
 }
 
 .category-badge {
-    width: 60px;
-    height: 60px;
-    border-radius: var(--radius-xl);
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.75rem;
-    font-weight: 800;
+    font-size: var(--font-size-xl);
+    font-weight: 700;
     color: white;
+    background: var(--gradient-primary);
     flex-shrink: 0;
 }
 
-.category-header h2 {
-    font-size: 1.75rem;
-    font-weight: 800;
+.category-info h2 {
+    font-size: var(--font-size-lg);
+    font-weight: 700;
     color: var(--gray-900);
-    margin-bottom: var(--spacing-xs);
+    margin: 0 0 var(--spacing-xs) 0;
 }
 
 .category-description {
-    color: var(--gray-600);
-    font-size: 1rem;
+    font-size: var(--font-size-sm);
+    color: var(--gray-500);
     margin: 0;
 }
 
+/* Category Progress */
 .category-progress {
-    margin-bottom: var(--spacing-2xl);
-    padding: var(--spacing-lg);
-    background: var(--gray-50);
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background: var(--neutral-light);
     border-radius: var(--radius-lg);
 }
 
+/* Questions List */
 .questions-list {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-xl);
-    margin-bottom: var(--spacing-2xl);
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
 }
 
 .question-card {
-    padding: var(--spacing-xl);
-    background: var(--gray-50);
+    padding: var(--spacing-lg);
+    background: var(--neutral-light);
     border-radius: var(--radius-lg);
     border: 2px solid transparent;
     transition: all var(--transition-base);
 }
 
 .question-card:hover {
-    border-color: var(--primary-light);
-    background: white;
+    border-color: var(--secondary-light);
 }
 
 .question-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
 }
 
 .question-number {
-    font-size: 0.75rem;
-    font-weight: 700;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--primary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: var(--primary);
 }
 
 .question-text {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: var(--gray-900);
-    margin-bottom: var(--spacing-lg);
-    line-height: 1.6;
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    color: var(--gray-800);
+    margin-bottom: var(--spacing-md);
+    line-height: 1.5;
 }
 
+/* Radio Group */
+.radio-group {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.radio-label {
+    flex: 1;
+    min-width: 60px;
+    padding: var(--spacing-sm) var(--spacing-xs);
+    background: white;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    text-align: center;
+}
+
+.radio-label:hover {
+    border-color: var(--secondary);
+}
+
+.radio-label.selected {
+    border-color: var(--primary);
+    background: var(--primary-100);
+}
+
+.radio-value {
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    color: var(--gray-800);
+    display: block;
+}
+
+.radio-text {
+    font-size: var(--font-size-xs);
+    color: var(--gray-500);
+    display: block;
+    margin-top: 2px;
+}
+
+.radio-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Navigation */
 .survey-navigation {
     display: flex;
     justify-content: space-between;
     gap: var(--spacing-md);
-    padding-top: var(--spacing-xl);
-    border-top: 2px solid var(--gray-100);
+    padding-top: var(--spacing-lg);
+    border-top: 2px solid var(--neutral);
 }
 
 .survey-navigation .btn {
-    min-width: 140px;
+    min-width: 120px;
 }
 
+/* Responsive */
 @media (max-width: 768px) {
     .survey-header {
-        padding: var(--spacing-lg) 0;
+        padding: var(--spacing-md) 0;
     }
 
     .survey-logo {
-        max-width: 70px;
+        height: 28px;
     }
 
     .survey-header h1 {
-        font-size: 1.5rem;
-    }
-
-    .survey-subtitle {
-        font-size: 0.875rem;
-        color: var(--gray-600);
-        /* Better contrast on mobile */
+        font-size: var(--font-size-lg);
     }
 
     .survey-header-content {
         flex-direction: column;
-        gap: var(--spacing-md);
         align-items: flex-start;
-    }
-
-    .header-left-survey {
-        gap: var(--spacing-md);
+        gap: var(--spacing-sm);
     }
 
     .category-section {
         padding: var(--spacing-lg);
+        border-radius: var(--radius-lg);
     }
 
     .category-header {
         flex-direction: column;
-        gap: var(--spacing-md);
+        align-items: flex-start;
     }
 
     .category-badge {
-        width: 50px;
-        height: 50px;
-        font-size: 1.5rem;
-    }
-
-    .category-header h2 {
-        font-size: 1.5rem;
-    }
-
-    .question-card {
-        padding: var(--spacing-lg);
-    }
-
-    .question-text {
-        font-size: 1rem;
+        width: 40px;
+        height: 40px;
+        font-size: var(--font-size-lg);
     }
 
     .radio-group {
@@ -244,21 +281,17 @@
     }
 
     .radio-label {
-        flex-direction: row;
+        display: flex;
+        align-items: center;
         justify-content: flex-start;
         gap: var(--spacing-md);
-        min-width: 100%;
+        text-align: left;
+        padding: var(--spacing-md);
         min-height: 48px;
-        /* Better touch target */
     }
 
     .radio-value {
-        font-size: 1.25rem;
-    }
-
-    .radio-text {
-        font-size: 0.875rem;
-        text-align: left;
+        font-size: var(--font-size-base);
     }
 
     .survey-navigation {
@@ -271,19 +304,15 @@
 }
 
 @media (max-width: 480px) {
-    .survey-logo {
-        max-width: 60px;
-    }
-
-    .survey-header h1 {
-        font-size: 1.25rem;
-    }
-
-    .category-header h2 {
-        font-size: 1.25rem;
+    .survey-content {
+        padding: 0 var(--spacing-md);
     }
 
     .question-card {
         padding: var(--spacing-md);
+    }
+
+    .question-text {
+        font-size: var(--font-size-sm);
     }
 }
