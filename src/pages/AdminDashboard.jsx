@@ -342,7 +342,7 @@ const AdminDashboard = () => {
                                     </button>
                                 </div>
                                 <div className="card-body">
-                                    <CategoryChart data={categoryAverages} />
+                                    <CategoryChart data={metrics.categoryAverages} />
                                 </div>
                             </div>
                         </div>
