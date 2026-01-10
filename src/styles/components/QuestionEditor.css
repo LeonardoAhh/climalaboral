@@ -30,9 +30,17 @@
     display: flex;
     gap: var(--spacing-lg);
     align-items: flex-start;
+    justify-content: space-between;
     margin-bottom: var(--spacing-xl);
     padding-bottom: var(--spacing-lg);
     border-bottom: 2px solid var(--gray-200);
+}
+
+.category-header>div:first-child {
+    display: flex;
+    gap: var(--spacing-lg);
+    align-items: flex-start;
+    flex: 1;
 }
 
 .category-badge {
@@ -100,6 +108,38 @@
     font-weight: 600;
     color: var(--gray-500);
     font-family: 'Courier New', monospace;
+    margin-right: var(--spacing-sm);
+}
+
+/* Botón de icono para eliminar */
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    border: 2px solid transparent;
+    background: transparent;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.btn-danger-outline {
+    color: var(--danger);
+    border-color: var(--danger);
+}
+
+.btn-danger-outline:hover {
+    background: var(--danger);
+    color: white;
+    transform: scale(1.05);
+}
+
+.btn-danger-outline:active {
+    transform: scale(0.95);
 }
 
 .question-edit-card textarea {

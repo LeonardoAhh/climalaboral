@@ -4,7 +4,7 @@
 
 .survey-container {
     min-height: 100vh;
-    background: var(--gradient-neutral);
+    background: #F9FAFB;
     padding-bottom: var(--spacing-2xl);
 }
 
@@ -22,12 +22,13 @@
 
 /* Header */
 .survey-header {
-    background: var(--gradient-primary);
+    background: white;
     padding: var(--spacing-lg) 0;
     margin-bottom: var(--spacing-xl);
     position: sticky;
     top: 0;
     z-index: var(--z-sticky);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .survey-header-content {
@@ -45,20 +46,47 @@
 .survey-logo {
     height: 36px;
     width: auto;
-    filter: brightness(0) invert(1);
+    filter: none;
 }
 
 .survey-header h1 {
     font-size: var(--font-size-xl);
     font-weight: 700;
-    color: white;
+    color: var(--primary);
     margin: 0;
 }
 
 .survey-subtitle {
     font-size: var(--font-size-sm);
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--primary-light);
     margin: 0;
+}
+
+/* Botón Salir - Solo Ícono */
+.btn-logout {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.btn-logout svg {
+    width: 20px;
+    height: 20px;
+}
+
+.btn-logout:hover {
+    background: var(--gradient-primary);
+    border-color: var(--primary);
+    color: white;
+    transform: scale(1.1);
 }
 
 /* Progress Section */
@@ -72,12 +100,12 @@
     align-items: center;
     margin-bottom: var(--spacing-xs);
     font-size: var(--font-size-sm);
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--primary);
 }
 
 .progress-percentage {
     font-weight: 700;
-    color: white;
+    color: var(--primary);
 }
 
 /* Survey Content */
@@ -135,8 +163,19 @@
 .category-progress {
     margin-bottom: var(--spacing-lg);
     padding: var(--spacing-md);
-    background: var(--neutral-light);
+    background: var(--gradient-primary);
+    border: 2px solid white;
     border-radius: var(--radius-lg);
+    color: white;
+}
+
+.category-progress .progress-info {
+    color: white;
+}
+
+.category-progress .progress-percentage {
+    color: white;
+    font-weight: 700;
 }
 
 /* Questions List */
@@ -149,14 +188,15 @@
 
 .question-card {
     padding: var(--spacing-lg);
-    background: var(--neutral-light);
+    background: white;
     border-radius: var(--radius-lg);
-    border: 2px solid transparent;
+    border: 2px solid var(--primary);
     transition: all var(--transition-base);
 }
 
 .question-card:hover {
-    border-color: var(--secondary-light);
+    border-color: var(--primary-dark);
+    box-shadow: 0 4px 12px rgba(26, 109, 162, 0.1);
 }
 
 .question-header {
@@ -251,13 +291,34 @@
     }
 
     .survey-header h1 {
-        font-size: var(--font-size-lg);
+        font-size: var(--font-size-base);
     }
 
     .survey-header-content {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
         gap: var(--spacing-sm);
+    }
+
+    .header-left-survey {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .survey-subtitle {
+        font-size: var(--font-size-xs);
+    }
+
+    .btn-logout {
+        width: 36px;
+        height: 36px;
+    }
+
+    .btn-logout svg {
+        width: 18px;
+        height: 18px;
     }
 
     .category-section {
