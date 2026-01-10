@@ -129,41 +129,30 @@ const DepartmentAnalytics = ({ employees, responses }) => {
             {/* Department Analytics */}
             <div className="analytics-section">
                 <h3 className="section-title">Análisis por Departamento</h3>
-                <p className="section-subtitle">Haz click en un departamento para ver sus métricas</p>
+                {/* <p className="section-subtitle">Haz click en un departamento para ver sus métricas</p> Removed as click functionality is removed */}
                 <div className="analytics-grid">
                     {analytics.departmentMetrics.map(dept => (
                         <div
                             key={dept.name}
-                            className={`analytics-card ${expandedDept === dept.name ? 'expanded' : ''}`}
-                            onClick={() => setExpandedDept(expandedDept === dept.name ? null : dept.name)}
+                            className="analytics-card" // Removed expanded class logic
+                        // onClick={() => setExpandedDept(expandedDept === dept.name ? null : dept.name)} Removed click handler
                         >
                             <div className="card-header-dept">
                                 <div>
                                     <h4>{dept.name}</h4>
                                     <span className="areas-count">{dept.areasCount} área{dept.areasCount !== 1 ? 's' : ''}</span>
                                 </div>
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    strokeWidth={2}
-                                    stroke="currentColor"
-                                    className={`expand-icon ${expandedDept === dept.name ? 'rotated' : ''}`}
-                                    style={{ width: 24, height: 24 }}
-                                >
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                                </svg>
+                                {/* Removed SVG expand icon */}
                             </div>
 
-                            {expandedDept === dept.name && (
-                                <div className="metrics-row">
-                                    <div className="metric metric-single">
-                                        <span className="metric-label">Participación</span>
-                                        <span className="metric-value metric-value-large">{dept.participationRate}%</span>
-                                        <span className="metric-detail">{dept.completed} de {dept.total} empleados completaron la encuesta</span>
-                                    </div>
+                            {/* Display metrics directly */}
+                            <div className="metrics-display">
+                                <div className="participation-metric">
+                                    <span className="participation-value">{dept.participationRate}%</span>
+                                    <span className="participation-label">de participación</span>
                                 </div>
-                            )}
+                                <span className="metric-detail">{dept.completed} de {dept.total} empleados</span>
+                            </div>
                         </div>
                     ))}
                 </div>

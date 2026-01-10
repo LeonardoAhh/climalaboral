@@ -31,49 +31,24 @@
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     border-radius: var(--radius-2xl);
-    padding: var(--spacing-xl);
+    padding: var(--spacing-lg);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.8);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-}
-
-.analytics-card::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: linear-gradient(180deg, #6366f1, #8b5cf6);
-    opacity: 0;
-    transition: opacity var(--transition-base);
-}
-
-.analytics-card:hover::after {
-    opacity: 1;
+    transition: all 0.3s ease;
 }
 
 .analytics-card:hover {
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
-    border-color: rgba(99, 102, 241, 0.3);
-    transform: translateY(-4px) scale(1.01);
-}
-
-.analytics-card.expanded {
-    border-color: #6366f1;
-    box-shadow: 0 15px 35px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
 }
 
 .card-header-dept {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing-lg);
-    padding-bottom: var(--spacing-md);
-    border-bottom: 2px solid var(--gray-100);
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--neutral);
 }
 
 .card-header-dept>div {
@@ -83,10 +58,52 @@
 }
 
 .card-header-dept h4 {
-    font-size: 1.125rem;
+    font-size: 1rem;
     font-weight: 700;
     color: var(--gray-900);
     margin: 0;
+}
+
+.areas-count {
+    font-size: 0.7rem;
+    color: var(--gray-500);
+    background: var(--neutral);
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    width: fit-content;
+}
+
+/* New participation display */
+.metrics-display {
+    text-align: center;
+    padding: var(--spacing-md) 0;
+}
+
+.participation-metric {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: var(--spacing-xs);
+}
+
+.participation-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1A6DA2;
+}
+
+.participation-label {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    font-weight: 500;
+}
+
+.metrics-display .metric-detail {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    margin-top: var(--spacing-xs);
 }
 
 .expand-icon {
