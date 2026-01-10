@@ -1,147 +1,386 @@
-/* ========================================
-   HOME PAGE - Minimalist Modern Design
-   ======================================== */
+/* ===================================
+   HOME PAGE - CLIMA LABORAL
+   =================================== */
 
+/* Variables CSS para fácil personalización */
+:root {
+    --primary-color: #4f46e5;
+    --primary-hover: #4338ca;
+    --secondary-color: #10b981;
+    --secondary-hover: #059669;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --bg-gradient-start: #f9fafb;
+    --bg-gradient-end: #e5e7eb;
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    --card-shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.15);
+    --border-radius: 20px;
+    --transition-speed: 0.3s;
+}
+
+/* Container principal */
 .home-container {
     min-height: 100vh;
-    background: var(--gradient-neutral);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--spacing-lg);
+    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+    padding: 2rem 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
 }
 
+/* Contenido principal */
 .home-content {
-    text-align: center;
-    max-width: 600px;
     width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ===================================
+   HEADER SECTION
+   =================================== */
+.home-header {
+    text-align: center;
+    margin-bottom: 3rem;
 }
 
 .home-logo {
-    max-width: 200px;
+    width: 120px;
     height: auto;
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: 1.5rem;
+    border-radius: 12px;
+    transition: transform var(--transition-speed) ease;
+}
+
+.home-logo:hover {
+    transform: scale(1.05);
 }
 
 .home-title {
-    font-size: var(--font-size-3xl);
+    font-size: 3rem;
     font-weight: 800;
-    color: var(--gray-900);
-    margin-bottom: var(--spacing-sm);
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
 }
 
 .home-subtitle {
-    font-size: var(--font-size-base);
-    color: var(--gray-600);
-    margin-bottom: var(--spacing-2xl);
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+    margin: 0;
 }
 
-.home-cards {
+/* ===================================
+   OPTIONS SECTION (Cards)
+   =================================== */
+.home-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.option-card {
     display: flex;
-    gap: var(--spacing-lg);
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-}
-
-.home-card {
-    flex: 1;
-    max-width: 260px;
+    padding: 3rem 2rem;
     background: white;
-    border-radius: var(--radius-2xl);
-    padding: var(--spacing-xl);
-    text-align: center;
-    border: none;
-    cursor: pointer;
-    transition: all var(--transition-base);
-    box-shadow: var(--shadow-card);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
     text-decoration: none;
-    color: inherit;
+    color: var(--text-primary);
+    transition: all var(--transition-speed) ease;
+    cursor: pointer;
+    border: 2px solid transparent;
     position: relative;
     overflow: hidden;
 }
 
-.home-card::before {
+.option-card::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
-    background: var(--gradient-primary);
-    transform: scaleX(0);
-    transition: transform var(--transition-base);
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(16, 185, 129, 0.05) 100%);
+    opacity: 0;
+    transition: opacity var(--transition-speed) ease;
+    z-index: 0;
 }
 
-.home-card:hover {
+.option-card:hover::before {
+    opacity: 1;
+}
+
+.option-card:hover {
     transform: translateY(-8px);
-    box-shadow: var(--shadow-xl);
+    box-shadow: var(--card-shadow-hover);
 }
 
-.home-card:hover::before {
-    transform: scaleX(1);
+.option-card:active {
+    transform: translateY(-4px);
 }
 
-.home-card-icon {
-    width: 56px;
-    height: 56px;
-    margin: 0 auto var(--spacing-md);
-    border-radius: var(--radius-xl);
+/* Employee Option */
+.employee-option:hover {
+    border-color: var(--primary-color);
+}
+
+.employee-option .option-icon {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+}
+
+/* Admin Option */
+.admin-option:hover {
+    border-color: var(--secondary-color);
+}
+
+.admin-option .option-icon {
+    background: linear-gradient(135deg, var(--secondary-color), var(--secondary-hover));
+}
+
+/* Icon container */
+.option-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--gradient-primary);
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+    transition: transform var(--transition-speed) ease;
+}
+
+.option-card:hover .option-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.option-icon svg {
+    width: 40px;
+    height: 40px;
     color: white;
 }
 
-.home-card-icon.secondary {
-    background: var(--gradient-secondary);
-}
-
-.home-card-icon svg {
-    width: 28px;
-    height: 28px;
-}
-
-.home-card-title {
-    font-size: var(--font-size-lg);
+/* Card title */
+.option-card h2 {
+    font-size: 1.75rem;
     font-weight: 700;
-    color: var(--gray-900);
-    margin-bottom: var(--spacing-xs);
+    margin: 0 0 0.5rem 0;
+    color: var(--text-primary);
+    position: relative;
+    z-index: 1;
 }
 
-.home-card-desc {
-    font-size: var(--font-size-sm);
-    color: var(--gray-500);
+/* Card description */
+.option-card p {
+    font-size: 1rem;
+    color: var(--text-secondary);
     margin: 0;
-    line-height: 1.5;
+    position: relative;
+    z-index: 1;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .home-logo {
-        max-width: 160px;
+/* ===================================
+   FOOTER SECTION
+   =================================== */
+.home-footer {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.home-footer p {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin: 0;
+    font-weight: 500;
+}
+
+/* ===================================
+   RESPONSIVE DESIGN
+   =================================== */
+
+/* Tablets (768px - 1024px) */
+@media (max-width: 1024px) {
+    .home-title {
+        font-size: 2.5rem;
+    }
+
+    .home-subtitle {
+        font-size: 1.1rem;
+    }
+
+    .home-options {
+        gap: 1.5rem;
+    }
+
+    .option-card {
+        padding: 2.5rem 1.5rem;
+    }
+}
+
+/* Mobile Landscape & Small Tablets (481px - 767px) */
+@media (max-width: 767px) {
+    .home-container {
+        padding: 1.5rem 1rem;
     }
 
     .home-title {
-        font-size: var(--font-size-2xl);
+        font-size: 2rem;
     }
 
-    .home-cards {
-        flex-direction: column;
-        align-items: center;
+    .home-subtitle {
+        font-size: 1rem;
     }
 
-    .home-card {
-        max-width: 100%;
-        width: 100%;
+    .home-logo {
+        width: 100px;
+        margin-bottom: 1rem;
+    }
+
+    .home-header {
+        margin-bottom: 2rem;
+    }
+
+    .home-options {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+    .option-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .option-card h2 {
+        font-size: 1.5rem;
+    }
+
+    .option-icon {
+        width: 70px;
+        height: 70px;
+        margin-bottom: 1rem;
+    }
+
+    .option-icon svg {
+        width: 35px;
+        height: 35px;
+    }
+
+    .home-footer {
+        margin-top: 2rem;
     }
 }
 
+/* Mobile Portrait (320px - 480px) */
 @media (max-width: 480px) {
     .home-container {
-        padding: var(--spacing-md);
+        padding: 1rem 0.75rem;
     }
 
-    .home-card {
-        padding: var(--spacing-lg);
+    .home-title {
+        font-size: 1.75rem;
+    }
+
+    .home-subtitle {
+        font-size: 0.95rem;
+    }
+
+    .home-logo {
+        width: 80px;
+    }
+
+    .home-options {
+        gap: 1rem;
+    }
+
+    .option-card {
+        padding: 1.75rem 1.25rem;
+    }
+
+    .option-card h2 {
+        font-size: 1.35rem;
+    }
+
+    .option-card p {
+        font-size: 0.9rem;
+    }
+
+    .option-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .option-icon svg {
+        width: 30px;
+        height: 30px;
+    }
+
+    .home-footer p {
+        font-size: 0.85rem;
+    }
+}
+
+/* Extra Small Mobile (< 320px) */
+@media (max-width: 319px) {
+    .home-title {
+        font-size: 1.5rem;
+    }
+
+    .home-subtitle {
+        font-size: 0.85rem;
+    }
+
+    .option-card {
+        padding: 1.5rem 1rem;
+    }
+
+    .option-card h2 {
+        font-size: 1.25rem;
+    }
+}
+
+/* ===================================
+   ACCESSIBILITY & FOCUS STATES
+   =================================== */
+.option-card:focus {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 4px;
+}
+
+.option-card:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* Dark mode support (opcional) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text-primary: #f9fafb;
+        --text-secondary: #d1d5db;
+        --bg-gradient-start: #111827;
+        --bg-gradient-end: #1f2937;
+    }
+
+    .option-card {
+        background: #374151;
+        color: var(--text-primary);
+    }
+}
+
+/* Reducir animaciones para usuarios que lo prefieran */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
 }
