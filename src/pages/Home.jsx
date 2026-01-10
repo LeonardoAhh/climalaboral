@@ -1,9 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
-import { auth, db } from '../config/firebase';
 import { useAuth } from '../context/AuthContext';
 import '../styles/pages/Home.css';
 
@@ -12,7 +9,7 @@ const Home = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    const { setCurrentUser } = useAuth();
+    const { loginAdmin, loginEmployee } = useAuth();
 
     // Admin form state
     const [adminEmail, setAdminEmail] = useState('');
@@ -34,12 +31,11 @@ const Home = () => {
         setError('');
 
         try {
-            const userCredential = await signInWithEmailAndPassword(auth, adminEmail, adminPassword);
-            setCurrentUser(userCredential.user);
+            await loginAdmin(adminEmail, adminPassword);
             navigate('/admin/dashboard');
         } catch (err) {
             console.error('Admin login error:', err);
-            setError('Credenciales incorrectas. Verifica tu email y contraseña.');
+            setError(err.message || 'Credenciales incorrectas. Verifica tu email y contraseña.');
         } finally {
             setLoading(false);
         }
@@ -51,49 +47,16 @@ const Home = () => {
         setError('');
 
         try {
-            // Search for employee in database
-            const employeesRef = collection(db, 'employees');
-            const q = query(employeesRef, where('employeeId', '==', employeeId));
-            const querySnapshot = await getDocs(q);
+            const result = await loginEmployee(employeeId, employeeName, employeeCurp);
 
-            if (querySnapshot.empty) {
-                setError('No se encontró el empleado. Verifica tu número de empleado.');
-                setLoading(false);
-                return;
-            }
-
-            const employeeDoc = querySnapshot.docs[0];
-            const employeeData = employeeDoc.data();
-
-            // Verify name and CURP
-            if (employeeData.name.toUpperCase() !== employeeName.toUpperCase()) {
-                setError('El nombre no coincide con el registro.');
-                setLoading(false);
-                return;
-            }
-
-            if (employeeData.curp.toUpperCase() !== employeeCurp.toUpperCase()) {
-                setError('El CURP no coincide con el registro.');
-                setLoading(false);
-                return;
-            }
-
-            // Create user object for context
-            const user = {
-                uid: employeeDoc.id,
-                ...employeeData
-            };
-            setCurrentUser(user);
-
-            // Check if survey is already completed
-            if (employeeData.surveyCompleted) {
+            if (result.surveyCompleted) {
                 navigate('/employee/complete');
             } else {
                 navigate('/employee/survey');
             }
         } catch (err) {
             console.error('Employee login error:', err);
-            setError('Error al verificar credenciales. Intenta de nuevo.');
+            setError(err.message || 'Error al verificar credenciales. Intenta de nuevo.');
         } finally {
             setLoading(false);
         }
