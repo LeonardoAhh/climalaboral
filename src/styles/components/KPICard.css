@@ -32,27 +32,27 @@
 
 /* Color variants with gradients */
 .kpi-card.primary {
-    --card-color: #6366f1;
-    --card-color-light: #8b5cf6;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+    --card-color: #1A6DA2;
+    --card-color-light: #62ADBB;
+    background: linear-gradient(135deg, rgba(26, 109, 162, 0.05) 0%, rgba(98, 173, 187, 0.05) 100%);
 }
 
 .kpi-card.secondary {
+    --card-color: #62ADBB;
+    --card-color-light: #8DC5D0;
+    background: linear-gradient(135deg, rgba(98, 173, 187, 0.05) 0%, rgba(141, 197, 208, 0.05) 100%);
+}
+
+.kpi-card.success {
     --card-color: #10b981;
     --card-color-light: #34d399;
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(52, 211, 153, 0.05) 100%);
 }
 
-.kpi-card.success {
-    --card-color: #22c55e;
-    --card-color-light: #4ade80;
-    background: linear-gradient(135deg, rgba(34, 197, 94, 0.05) 0%, rgba(74, 222, 128, 0.05) 100%);
-}
-
 .kpi-card.warning {
-    --card-color: #f59e0b;
-    --card-color-light: #fbbf24;
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.05) 0%, rgba(251, 191, 36, 0.05) 100%);
+    --card-color: #F2691A;
+    --card-color-light: #F58A4A;
+    background: linear-gradient(135deg, rgba(242, 105, 26, 0.05) 0%, rgba(245, 138, 74, 0.05) 100%);
 }
 
 .kpi-header {
