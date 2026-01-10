@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { collection, getDocs, doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
@@ -145,32 +145,44 @@ const AdminDashboard = () => {
         }
     };
 
-    // Calculate KPIs
-    const totalEmployees = employees.length;
-    const completedSurveys = employees.filter(e => e.surveyCompleted).length;
-    const participationRate = totalEmployees > 0
-        ? ((completedSurveys / totalEmployees) * 100).toFixed(1)
-        : 0;
-
-    const overallAverage = responses.length > 0
-        ? (responses.reduce((sum, r) => sum + r.overallScore, 0) / responses.length).toFixed(2)
-        : 0;
-
-    // Calculate category averages
-    const categoryAverages = {};
-    Object.keys(categoryInfo).forEach(category => {
-        const scores = responses.map(r => r.categoryScores?.[category] || 0);
-        const average = scores.length > 0
-            ? scores.reduce((a, b) => a + b, 0) / scores.length
+    // Memoize expensive calculations
+    const metrics = useMemo(() => {
+        const totalEmployees = employees.length;
+        const completedSurveys = employees.filter(e => e.surveyCompleted).length;
+        const participationRate = totalEmployees > 0
+            ? ((completedSurveys / totalEmployees) * 100).toFixed(1)
             : 0;
-        categoryAverages[category] = parseFloat(average.toFixed(2));
-    });
 
-    // Find highest and lowest categories
-    const sortedCategories = Object.entries(categoryAverages)
-        .sort(([, a], [, b]) => b - a);
-    const highestCategory = sortedCategories[0];
-    const lowestCategory = sortedCategories[sortedCategories.length - 1];
+        const overallAverage = responses.length > 0
+            ? (responses.reduce((sum, r) => sum + r.overallScore, 0) / responses.length).toFixed(2)
+            : 0;
+
+        // Calculate category averages
+        const categoryAverages = {};
+        Object.keys(categoryInfo).forEach(category => {
+            const scores = responses.map(r => r.categoryScores?.[category] || 0);
+            const average = scores.length > 0
+                ? scores.reduce((a, b) => a + b, 0) / scores.length
+                : 0;
+            categoryAverages[category] = parseFloat(average.toFixed(2));
+        });
+
+        // Find highest and lowest categories
+        const sortedCategories = Object.entries(categoryAverages)
+            .sort(([, a], [, b]) => b - a);
+        const highestCategory = sortedCategories[0];
+        const lowestCategory = sortedCategories[sortedCategories.length - 1];
+
+        return {
+            totalEmployees,
+            completedSurveys,
+            participationRate,
+            overallAverage,
+            categoryAverages,
+            highestCategory,
+            lowestCategory
+        };
+    }, [employees, responses]);
 
     const exportToCSV = () => {
         if (responses.length === 0) {
@@ -287,40 +299,41 @@ const AdminDashboard = () => {
                         <div className="kpi-grid">
                             <KPICard
                                 title="Tasa de Participación"
-                                value={`${participationRate}%`}
-                                subtitle={`${completedSurveys} de ${totalEmployees} empleados`}
+                                value={`${metrics.participationRate}%`}
+                                subtitle={`${metrics.completedSurveys} de ${metrics.totalEmployees} empleados`}
                                 icon="users"
                                 color="primary"
-                                trend={participationRate >= 70 ? 'up' : 'down'}
+                                trend={metrics.participationRate >= 70 ? 'up' : 'down'}
                             />
                             <KPICard
                                 title="Promedio General"
-                                value={overallAverage}
+                                value={metrics.overallAverage}
                                 subtitle="Escala de 1 a 5"
                                 icon="star"
                                 color="secondary"
-                                trend={overallAverage >= 3.5 ? 'up' : 'down'}
+                                trend={metrics.overallAverage >= 3.5 ? 'up' : 'down'}
                             />
                             <KPICard
                                 title="Categoría Mejor Valorada"
-                                value={highestCategory ? categoryInfo[highestCategory[0]]?.name : 'N/A'}
-                                subtitle={highestCategory ? `${highestCategory[1]} puntos` : ''}
+                                value={metrics.highestCategory ? categoryInfo[metrics.highestCategory[0]]?.name : 'N/A'}
+                                subtitle={metrics.highestCategory ? `${metrics.highestCategory[1]} puntos` : ''}
                                 icon="trophy"
                                 color="success"
                             />
                             <KPICard
                                 title="Área de Oportunidad"
-                                value={lowestCategory ? categoryInfo[lowestCategory[0]]?.name : 'N/A'}
-                                subtitle={lowestCategory ? `${lowestCategory[1]} puntos` : ''}
+                                value={metrics.lowestCategory ? categoryInfo[metrics.lowestCategory[0]]?.name : 'N/A'}
+                                subtitle={metrics.lowestCategory ? `${metrics.lowestCategory[1]} puntos` : ''}
                                 icon="alert"
                                 color="warning"
                             />
                         </div>
 
-                        <div className="charts-section">
-                            <div className="card">
+                        {/* Charts */}
+                        <div className="charts-grid">
+                            <div className="chart-card">
                                 <div className="card-header">
-                                    <h3 className="card-title">Resultados por Categoría</h3>
+                                    <h3>Promedio por Categoría</h3>
                                     <button onClick={exportToCSV} className="btn btn-outline btn-sm">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 18, height: 18 }}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
