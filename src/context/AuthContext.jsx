@@ -156,6 +156,41 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    // Verify employee ID only (for step 1 of login)
+    // Security: Only returns first name to prevent full data exposure
+    const verifyEmployeeId = async (employeeId) => {
+        try {
+            // Sanitize input
+            const sanitizedId = employeeId.trim().replace(/[^0-9]/g, '');
+
+            if (!sanitizedId || sanitizedId.length < 1) {
+                throw new Error('ID de empleado inválido.');
+            }
+
+            const employeeDocRef = doc(db, 'employees', `emp_${sanitizedId}`);
+            const employeeSnap = await getDoc(employeeDocRef);
+
+            if (!employeeSnap.exists()) {
+                // Generic error to prevent ID enumeration
+                throw new Error('No se pudo verificar el empleado. Verifica tu número.');
+            }
+
+            const employeeData = employeeSnap.data();
+
+            // Only return first name for privacy
+            const firstName = employeeData.name.split(' ')[0];
+
+            return {
+                success: true,
+                name: firstName, // Only first name shown in UI
+                fullName: employeeData.name // Full name stored internally for validation
+            };
+        } catch (error) {
+            console.error('Error verifying employee ID:', error);
+            throw error;
+        }
+    };
+
     const value = {
         currentUser,
         userType,
@@ -163,7 +198,8 @@ export const AuthProvider = ({ children }) => {
         loginEmployee,
         loginAdmin,
         signOut,
-        checkSurveyStatus
+        checkSurveyStatus,
+        verifyEmployeeId
     };
 
     return (

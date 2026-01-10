@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
@@ -9,45 +9,119 @@ const Home = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    const { loginAdmin, loginEmployee } = useAuth();
+    const { loginAdmin, loginEmployee, verifyEmployeeId } = useAuth();
+
+    // Rate limiting
+    const failedAttempts = useRef(0);
+    const lockoutUntil = useRef(null);
+    const MAX_ATTEMPTS = 5;
+    const LOCKOUT_DURATION = 30000; // 30 seconds
 
     // Admin form state
     const [adminEmail, setAdminEmail] = useState('');
     const [adminPassword, setAdminPassword] = useState('');
 
-    // Employee form state
+    // Employee form state - Multi-step
+    const [employeeStep, setEmployeeStep] = useState(1); // 1: ID, 2: CURP
     const [employeeId, setEmployeeId] = useState('');
     const [employeeName, setEmployeeName] = useState('');
     const [employeeCurp, setEmployeeCurp] = useState('');
 
+    // Check if locked out
+    const isLockedOut = () => {
+        if (lockoutUntil.current && Date.now() < lockoutUntil.current) {
+            const secondsLeft = Math.ceil((lockoutUntil.current - Date.now()) / 1000);
+            setError(`Demasiados intentos fallidos. Espera ${secondsLeft} segundos.`);
+            return true;
+        }
+        if (lockoutUntil.current && Date.now() >= lockoutUntil.current) {
+            // Reset lockout
+            lockoutUntil.current = null;
+            failedAttempts.current = 0;
+        }
+        return false;
+    };
+
+    // Handle failed attempt
+    const handleFailedAttempt = () => {
+        failedAttempts.current += 1;
+        if (failedAttempts.current >= MAX_ATTEMPTS) {
+            lockoutUntil.current = Date.now() + LOCKOUT_DURATION;
+        }
+    };
+
+    // Reset attempts on success
+    const resetAttempts = () => {
+        failedAttempts.current = 0;
+        lockoutUntil.current = null;
+    };
+
     const handleToggle = () => {
         setIsAdminView(!isAdminView);
         setError('');
+        // Reset employee form
+        setEmployeeStep(1);
+        setEmployeeId('');
+        setEmployeeName('');
+        setEmployeeCurp('');
     };
 
     const handleAdminLogin = async (e) => {
         e.preventDefault();
+
+        if (isLockedOut()) return;
+
         setLoading(true);
         setError('');
 
         try {
             await loginAdmin(adminEmail, adminPassword);
+            resetAttempts();
             navigate('/admin/dashboard');
         } catch (err) {
             console.error('Admin login error:', err);
+            handleFailedAttempt();
             setError(err.message || 'Credenciales incorrectas. Verifica tu email y contraseña.');
         } finally {
             setLoading(false);
         }
     };
 
+    // Step 1: Verify Employee ID
+    const handleVerifyId = async (e) => {
+        e.preventDefault();
+
+        if (isLockedOut()) return;
+
+        setLoading(true);
+        setError('');
+
+        try {
+            const result = await verifyEmployeeId(employeeId);
+            setEmployeeName(result.fullName); // Store full name for login validation
+            resetAttempts();
+            setEmployeeStep(2);
+        } catch (err) {
+            console.error('Employee ID verification error:', err);
+            handleFailedAttempt();
+            setError(err.message || 'No se pudo verificar. Intenta de nuevo.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Step 2: Complete login with CURP
     const handleEmployeeLogin = async (e) => {
         e.preventDefault();
+
+        if (isLockedOut()) return;
+
         setLoading(true);
         setError('');
 
         try {
             const result = await loginEmployee(employeeId, employeeName, employeeCurp);
+            resetAttempts();
 
             if (result.surveyCompleted) {
                 navigate('/employee/complete');
@@ -56,10 +130,19 @@ const Home = () => {
             }
         } catch (err) {
             console.error('Employee login error:', err);
-            setError(err.message || 'Error al verificar credenciales. Intenta de nuevo.');
+            handleFailedAttempt();
+            setError(err.message || 'CURP incorrecto. Intenta de nuevo.');
         } finally {
             setLoading(false);
         }
+    };
+
+    // Go back to step 1
+    const handleBackToStep1 = () => {
+        setEmployeeStep(1);
+        setEmployeeName('');
+        setEmployeeCurp('');
+        setError('');
     };
 
     return (
@@ -76,8 +159,8 @@ const Home = () => {
                     >
                         {/* Hero Left Side */}
                         <div className="hero-section hero-left">
-                            <div className="hero-overlay"></div>
-                            <div className="hero-content">
+                            {/* Logo Header */}
+                            <div className="hero-header">
                                 <motion.img
                                     src="/logo-vinoplastic.png"
                                     alt="Vino Plastic"
@@ -86,50 +169,52 @@ const Home = () => {
                                     animate={{ y: 0, opacity: 1 }}
                                     transition={{ delay: 0.2 }}
                                 />
-                                <motion.h1
-                                    className="hero-title"
-                                    initial={{ y: 20, opacity: 0 }}
-                                    animate={{ y: 0, opacity: 1 }}
-                                    transition={{ delay: 0.3 }}
-                                >
-                                    Encuesta de<br />Clima Laboral
-                                </motion.h1>
-                                <motion.p
-                                    className="hero-subtitle"
-                                    initial={{ y: 20, opacity: 0 }}
-                                    animate={{ y: 0, opacity: 1 }}
-                                    transition={{ delay: 0.4 }}
-                                >
-                                    Tu opinión construye un mejor ambiente de trabajo
-                                </motion.p>
-                                <motion.div
-                                    className="hero-features"
-                                    initial={{ y: 20, opacity: 0 }}
-                                    animate={{ y: 0, opacity: 1 }}
-                                    transition={{ delay: 0.5 }}
-                                >
-                                    <div className="feature-item">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        <span>100% Confidencial</span>
-                                    </div>
-                                    <div className="feature-item">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        <span>Solo 10 minutos</span>
-                                    </div>
-                                </motion.div>
+                            </div>
+
+                            {/* Hero Content */}
+                            <div className="hero-body">
+                                <div className="hero-overlay"></div>
+                                <div className="hero-content">
+                                    <motion.h1
+                                        className="hero-title"
+                                        initial={{ y: 20, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                        transition={{ delay: 0.3 }}
+                                    >
+                                        Encuesta de<br />Clima Laboral
+                                    </motion.h1>
+                                    <motion.p
+                                        className="hero-subtitle"
+                                        initial={{ y: 20, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                        transition={{ delay: 0.4 }}
+                                    >
+                                        Tu opinión construye un mejor ambiente de trabajo
+                                    </motion.p>
+                                    <motion.div
+                                        className="hero-features"
+                                        initial={{ y: 20, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                        transition={{ delay: 0.5 }}
+                                    >
+                                        <div className="feature-item">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <span>100% Confidencial</span>
+                                        </div>
+                                        <div className="feature-item">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <span>Solo 10 minutos</span>
+                                        </div>
+                                    </motion.div>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Toggle Button */}
-                        <button className="toggle-button" onClick={handleToggle} aria-label="Cambiar a login de empleado">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
-                            </svg>
-                        </button>
+
 
                         {/* Admin Login Right Side */}
                         <div className="form-section form-right">
@@ -230,70 +315,122 @@ const Home = () => {
                                         </svg>
                                     </div>
                                     <h2>Acceso Empleado</h2>
-                                    <p>Ingresa tus datos para responder la encuesta</p>
+                                    <p>{employeeStep === 1 ? 'Ingresa tu número de empleado' : `¡Hola, ${employeeName.split(' ')[0]}!`}</p>
                                 </div>
 
-                                <form onSubmit={handleEmployeeLogin} className="login-form">
-                                    {error && (
-                                        <motion.div
-                                            className="error-message"
-                                            initial={{ opacity: 0, y: -10 }}
-                                            animate={{ opacity: 1, y: 0 }}
+                                {/* Step Indicator */}
+                                <div className="step-indicator">
+                                    <div className={`step ${employeeStep >= 1 ? 'active' : ''}`}>1</div>
+                                    <div className="step-line"></div>
+                                    <div className={`step ${employeeStep >= 2 ? 'active' : ''}`}>2</div>
+                                </div>
+
+                                <AnimatePresence mode="wait">
+                                    {employeeStep === 1 ? (
+                                        <motion.form
+                                            key="step1"
+                                            onSubmit={handleVerifyId}
+                                            className="login-form"
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, x: 20 }}
                                         >
-                                            {error}
-                                        </motion.div>
-                                    )}
+                                            {error && (
+                                                <motion.div
+                                                    className="error-message"
+                                                    initial={{ opacity: 0, y: -10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                >
+                                                    {error}
+                                                </motion.div>
+                                            )}
 
-                                    <div className="form-group">
-                                        <label htmlFor="employee-id">Número de Empleado</label>
-                                        <input
-                                            type="text"
-                                            id="employee-id"
-                                            value={employeeId}
-                                            onChange={(e) => setEmployeeId(e.target.value)}
-                                            placeholder="Ej: 3204"
-                                            required
-                                        />
-                                    </div>
+                                            <div className="form-group">
+                                                <label htmlFor="employee-id">Número de Empleado</label>
+                                                <input
+                                                    type="text"
+                                                    id="employee-id"
+                                                    value={employeeId}
+                                                    onChange={(e) => setEmployeeId(e.target.value)}
+                                                    placeholder="Ej: 3204"
+                                                    required
+                                                    autoFocus
+                                                />
+                                            </div>
 
-                                    <div className="form-group">
-                                        <label htmlFor="employee-name">Nombre Completo</label>
-                                        <input
-                                            type="text"
-                                            id="employee-name"
-                                            value={employeeName}
-                                            onChange={(e) => setEmployeeName(e.target.value.toUpperCase())}
-                                            placeholder="NOMBRE APELLIDO APELLIDO"
-                                            required
-                                        />
-                                    </div>
+                                            <button type="submit" className="btn-submit employee-btn" disabled={loading}>
+                                                {loading ? (
+                                                    <span className="loading-spinner"></span>
+                                                ) : (
+                                                    <>
+                                                        Verificar ID
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                                                        </svg>
+                                                    </>
+                                                )}
+                                            </button>
+                                        </motion.form>
+                                    ) : (
+                                        <motion.form
+                                            key="step2"
+                                            onSubmit={handleEmployeeLogin}
+                                            className="login-form"
+                                            initial={{ opacity: 0, x: 20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, x: -20 }}
+                                        >
+                                            {error && (
+                                                <motion.div
+                                                    className="error-message"
+                                                    initial={{ opacity: 0, y: -10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                >
+                                                    {error}
+                                                </motion.div>
+                                            )}
 
-                                    <div className="form-group">
-                                        <label htmlFor="employee-curp">CURP</label>
-                                        <input
-                                            type="text"
-                                            id="employee-curp"
-                                            value={employeeCurp}
-                                            onChange={(e) => setEmployeeCurp(e.target.value.toUpperCase())}
-                                            placeholder="XXXX000000XXXXXX00"
-                                            maxLength={18}
-                                            required
-                                        />
-                                    </div>
+                                            <div className="employee-info-card">
+                                                <span className="info-label">Empleado:</span>
+                                                <span className="info-value">{employeeName.split(' ')[0]} {employeeName.split(' ')[1]?.charAt(0) || ''}.</span>
+                                            </div>
 
-                                    <button type="submit" className="btn-submit employee-btn" disabled={loading}>
-                                        {loading ? (
-                                            <span className="loading-spinner"></span>
-                                        ) : (
-                                            <>
-                                                Continuar a la Encuesta
+                                            <div className="form-group">
+                                                <label htmlFor="employee-curp">Confirma tu CURP</label>
+                                                <input
+                                                    type="text"
+                                                    id="employee-curp"
+                                                    value={employeeCurp}
+                                                    onChange={(e) => setEmployeeCurp(e.target.value.toUpperCase())}
+                                                    placeholder="XXXX000000XXXXXX00"
+                                                    maxLength={18}
+                                                    required
+                                                    autoFocus
+                                                />
+                                            </div>
+
+                                            <button type="submit" className="btn-submit employee-btn" disabled={loading}>
+                                                {loading ? (
+                                                    <span className="loading-spinner"></span>
+                                                ) : (
+                                                    <>
+                                                        Continuar a la Encuesta
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                                                        </svg>
+                                                    </>
+                                                )}
+                                            </button>
+
+                                            <button type="button" onClick={handleBackToStep1} className="btn-back">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                                                 </svg>
-                                            </>
-                                        )}
-                                    </button>
-                                </form>
+                                                Cambiar número de empleado
+                                            </button>
+                                        </motion.form>
+                                    )}
+                                </AnimatePresence>
 
                                 <div className="form-footer">
                                     <button onClick={handleToggle} className="switch-link">
@@ -303,17 +440,12 @@ const Home = () => {
                             </motion.div>
                         </div>
 
-                        {/* Toggle Button */}
-                        <button className="toggle-button" onClick={handleToggle} aria-label="Cambiar a login de administrador">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
-                            </svg>
-                        </button>
+
 
                         {/* Hero Right Side */}
                         <div className="hero-section hero-right">
-                            <div className="hero-overlay"></div>
-                            <div className="hero-content">
+                            {/* Logo Header */}
+                            <div className="hero-header">
                                 <motion.img
                                     src="/logo-vinoplastic.png"
                                     alt="Vino Plastic"
@@ -322,41 +454,47 @@ const Home = () => {
                                     animate={{ y: 0, opacity: 1 }}
                                     transition={{ delay: 0.2 }}
                                 />
-                                <motion.h1
-                                    className="hero-title"
-                                    initial={{ y: 20, opacity: 0 }}
-                                    animate={{ y: 0, opacity: 1 }}
-                                    transition={{ delay: 0.3 }}
-                                >
-                                    Tu Voz<br />Importa
-                                </motion.h1>
-                                <motion.p
-                                    className="hero-subtitle"
-                                    initial={{ y: 20, opacity: 0 }}
-                                    animate={{ y: 0, opacity: 1 }}
-                                    transition={{ delay: 0.4 }}
-                                >
-                                    Juntos construimos el mejor lugar para trabajar
-                                </motion.p>
-                                <motion.div
-                                    className="hero-features"
-                                    initial={{ y: 20, opacity: 0 }}
-                                    animate={{ y: 0, opacity: 1 }}
-                                    transition={{ delay: 0.5 }}
-                                >
-                                    <div className="feature-item">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                                        </svg>
-                                        <span>Respuestas Anónimas</span>
-                                    </div>
-                                    <div className="feature-item">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
-                                        </svg>
-                                        <span>Mejora Continua</span>
-                                    </div>
-                                </motion.div>
+                            </div>
+
+                            {/* Hero Content */}
+                            <div className="hero-body">
+                                <div className="hero-content">
+                                    <motion.h1
+                                        className="hero-title"
+                                        initial={{ y: 20, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                        transition={{ delay: 0.3 }}
+                                    >
+                                        Tu Voz<br />Importa
+                                    </motion.h1>
+                                    <motion.p
+                                        className="hero-subtitle"
+                                        initial={{ y: 20, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                        transition={{ delay: 0.4 }}
+                                    >
+                                        Juntos construimos el mejor lugar para trabajar
+                                    </motion.p>
+                                    <motion.div
+                                        className="hero-features"
+                                        initial={{ y: 20, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                        transition={{ delay: 0.5 }}
+                                    >
+                                        <div className="feature-item">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                                            </svg>
+                                            <span>Respuestas Anónimas</span>
+                                        </div>
+                                        <div className="feature-item">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
+                                            </svg>
+                                            <span>Mejora Continua</span>
+                                        </div>
+                                    </motion.div>
+                                </div>
                             </div>
                         </div>
                     </motion.div>
