@@ -176,6 +176,78 @@
     margin-bottom: var(--spacing-md);
 }
 
+/* Export Dropdown */
+.export-dropdown-container {
+    position: relative;
+}
+
+.export-dropdown-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.export-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    min-width: 240px;
+    z-index: 1000;
+    overflow: hidden;
+    animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.export-option {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    background: white;
+    border: none;
+    color: #1F2937;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #F3F4F6;
+}
+
+.export-option:last-child {
+    border-bottom: none;
+}
+
+.export-option svg {
+    width: 20px;
+    height: 20px;
+    color: #1A6DA2;
+    flex-shrink: 0;
+}
+
+.export-option:hover {
+    background: #F0F9FF;
+    color: #1A6DA2;
+}
+
+.export-option:hover svg {
+    transform: scale(1.1);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .dashboard-header {

@@ -11,6 +11,9 @@ import ResponsesTable from '../components/admin/ResponsesTable';
 import QuestionEditor from '../components/admin/QuestionEditor';
 import EmployeeManager from '../components/admin/EmployeeManager';
 import DepartmentAnalytics from '../components/admin/DepartmentAnalytics';
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import '../styles/pages/AdminDashboard.css';
 
 const AdminDashboard = () => {
@@ -19,6 +22,7 @@ const AdminDashboard = () => {
     const [questions, setQuestions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('overview'); // overview, responses, questions, employees
+    const [showExportMenu, setShowExportMenu] = useState(false);
     const { signOut } = useAuth();
     const navigate = useNavigate();
 
@@ -220,6 +224,135 @@ const AdminDashboard = () => {
         link.click();
     };
 
+    const exportToExcel = () => {
+        if (responses.length === 0) {
+            alert('No hay datos para exportar');
+            return;
+        }
+
+        // Prepare data
+        const headers = ['ID Empleado', 'Nombre', 'Fecha', 'Promedio General'];
+        Object.keys(categoryInfo).forEach(cat => {
+            headers.push(categoryInfo[cat].name);
+        });
+
+        const data = responses.map(r => {
+            const row = [
+                r.employeeId,
+                r.employeeName,
+                new Date(r.submittedAt.seconds * 1000).toLocaleDateString('es-MX'),
+                r.overallScore
+            ];
+            Object.keys(categoryInfo).forEach(cat => {
+                row.push(r.categoryScores?.[cat] || 0);
+            });
+            return row;
+        });
+
+        // Create workbook
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
+
+        // Set column widths
+        ws['!cols'] = [
+            { wch: 15 }, // ID
+            { wch: 30 }, // Nombre
+            { wch: 12 }, // Fecha
+            { wch: 18 }, // Promedio
+            ...Object.keys(categoryInfo).map(() => ({ wch: 20 }))
+        ];
+
+        XLSX.utils.book_append_sheet(wb, ws, 'Resultados');
+        XLSX.writeFile(wb, `clima-laboral-${new Date().toISOString().split('T')[0]}.xlsx`);
+    };
+
+    const exportToPDF = () => {
+        if (responses.length === 0) {
+            alert('No hay datos para exportar');
+            return;
+        }
+
+        const doc = new jsPDF('l', 'mm', 'a4'); // Landscape orientation
+
+        // Header
+        doc.setFontSize(18);
+        doc.setTextColor(26, 109, 162); // Primary blue
+        doc.text('Reporte de Clima Laboral', 14, 15);
+
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text(`Generado: ${new Date().toLocaleDateString('es-MX')}`, 14, 22);
+        doc.text(`Total de respuestas: ${responses.length}`, 14, 27);
+
+        // Prepare table data
+        const headers = [['ID', 'Nombre', 'Fecha', 'Promedio', ...Object.values(categoryInfo).map(c => c.name)]];
+
+        const data = responses.map(r => [
+            r.employeeId,
+            r.employeeName,
+            new Date(r.submittedAt.seconds * 1000).toLocaleDateString('es-MX'),
+            r.overallScore.toFixed(2),
+            ...Object.keys(categoryInfo).map(cat => (r.categoryScores?.[cat] || 0).toFixed(2))
+        ]);
+
+        // Add table
+        doc.autoTable({
+            head: headers,
+            body: data,
+            startY: 35,
+            theme: 'grid',
+            headStyles: {
+                fillColor: [26, 109, 162], // Primary blue
+                textColor: [255, 255, 255],
+                fontSize: 9,
+                fontStyle: 'bold'
+            },
+            bodyStyles: {
+                fontSize: 8
+            },
+            alternateRowStyles: {
+                fillColor: [245, 245, 245]
+            },
+            columnStyles: {
+                0: { cellWidth: 20 },
+                1: { cellWidth: 50 },
+                2: { cellWidth: 25 },
+                3: { cellWidth: 20, halign: 'center' }
+            },
+            didParseCell: (data) => {
+                // Color code scores
+                if (data.section === 'body' && data.column.index >= 3) {
+                    const value = parseFloat(data.cell.text[0]);
+                    if (!isNaN(value)) {
+                        if (value >= 4.0) {
+                            data.cell.styles.textColor = [34, 197, 94]; // Green
+                        } else if (value >= 3.0) {
+                            data.cell.styles.textColor = [234, 179, 8]; // Yellow
+                        } else {
+                            data.cell.styles.textColor = [239, 68, 68]; // Red
+                        }
+                    }
+                }
+            }
+        });
+
+        // Footer
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(150);
+            doc.text(
+                `Página ${i} de ${pageCount}`,
+                doc.internal.pageSize.getWidth() / 2,
+                doc.internal.pageSize.getHeight() - 10,
+                { align: 'center' }
+            );
+        }
+
+        doc.save(`clima-laboral-${new Date().toISOString().split('T')[0]}.pdf`);
+    };
+
     if (loading) {
         return (
             <div className="dashboard-loading">
@@ -336,12 +469,42 @@ const AdminDashboard = () => {
                             <div className="chart-card">
                                 <div className="card-header">
                                     <h3>Promedio por Categoría</h3>
-                                    <button onClick={exportToCSV} className="btn btn-outline btn-sm">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 18, height: 18 }}>
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                                        </svg>
-                                        Exportar CSV
-                                    </button>
+                                    <div className="export-dropdown-container">
+                                        <button
+                                            onClick={() => setShowExportMenu(!showExportMenu)}
+                                            className="btn btn-outline btn-sm export-dropdown-btn"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 18, height: 18 }}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                            </svg>
+                                            Exportar
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: 14, height: 14, marginLeft: 4 }}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                            </svg>
+                                        </button>
+                                        {showExportMenu && (
+                                            <div className="export-dropdown-menu">
+                                                <button onClick={() => { exportToCSV(); setShowExportMenu(false); }} className="export-option">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                                                    </svg>
+                                                    CSV - Datos Básicos
+                                                </button>
+                                                <button onClick={() => { exportToExcel(); setShowExportMenu(false); }} className="export-option">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 01-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0112 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h7.5" />
+                                                    </svg>
+                                                    Excel - Formato Avanzado
+                                                </button>
+                                                <button onClick={() => { exportToPDF(); setShowExportMenu(false); }} className="export-option">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                                                    </svg>
+                                                    PDF - Reporte Profesional
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="card-body">
                                     <CategoryChart data={metrics.categoryAverages} />
