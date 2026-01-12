@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import '../../styles/components/EmployeeManager.css';
 
-const EmployeeManager = ({ employees, onAdd, onEdit, onDelete }) => {
+const EmployeeManager = ({ employees, onAdd, onEdit, onDelete, failedImports = [], onResolveFailed, onDismissFailed }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterDepartment, setFilterDepartment] = useState('');
     const [showModal, setShowModal] = useState(false);
@@ -15,11 +15,75 @@ const EmployeeManager = ({ employees, onAdd, onEdit, onDelete }) => {
         department: '',
         area: ''
     });
+    const [formErrors, setFormErrors] = useState({});
 
     const ITEMS_PER_PAGE = 10;
 
-    // Get unique departments
-    const departments = [...new Set(employees.map(emp => emp.department))].sort();
+    // Get unique departments and areas
+    const departments = [...new Set(employees.map(emp => emp.department).filter(Boolean))].sort();
+    const areas = [...new Set(employees.map(emp => emp.area).filter(Boolean))].sort();
+
+    // CURP validation regex (formato mexicano)
+    const CURP_REGEX = /^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[0-9A-Z][0-9]$/;
+
+    // Validate form
+    const validateForm = () => {
+        const errors = {};
+
+        // ID validation
+        if (!formData.employeeId.trim()) {
+            errors.employeeId = 'El ID es requerido';
+        } else if (!/^\d+$/.test(formData.employeeId.trim())) {
+            errors.employeeId = 'El ID debe contener solo números';
+        } else if (!editingEmployee) {
+            // Check if ID already exists (only for new employees)
+            const existingEmployee = employees.find(
+                emp => emp.employeeId === formData.employeeId.trim()
+            );
+            if (existingEmployee) {
+                errors.employeeId = 'Este ID ya está registrado';
+            }
+        }
+
+        // Name validation
+        if (!formData.name.trim()) {
+            errors.name = 'El nombre es requerido';
+        } else if (formData.name.trim().length < 5) {
+            errors.name = 'El nombre debe tener al menos 5 caracteres';
+        } else if (!/^[A-ZÁÉÍÓÚÑ\s]+$/.test(formData.name.trim())) {
+            errors.name = 'El nombre solo debe contener letras';
+        }
+
+        // CURP validation
+        if (!formData.curp.trim()) {
+            errors.curp = 'El CURP es requerido';
+        } else if (formData.curp.trim().length !== 18) {
+            errors.curp = 'El CURP debe tener exactamente 18 caracteres';
+        } else if (!CURP_REGEX.test(formData.curp.trim())) {
+            errors.curp = 'El formato del CURP no es válido';
+        } else if (!editingEmployee) {
+            // Check if CURP already exists
+            const existingCurp = employees.find(
+                emp => emp.curp.toUpperCase() === formData.curp.trim().toUpperCase()
+            );
+            if (existingCurp) {
+                errors.curp = 'Este CURP ya está registrado';
+            }
+        }
+
+        // Department validation
+        if (!formData.department.trim()) {
+            errors.department = 'El departamento es requerido';
+        }
+
+        // Area validation
+        if (!formData.area.trim()) {
+            errors.area = 'El área es requerida';
+        }
+
+        setFormErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
 
     // Filter employees
     const filteredEmployees = employees.filter(emp => {
@@ -81,6 +145,7 @@ const EmployeeManager = ({ employees, onAdd, onEdit, onDelete }) => {
     const handleCloseModal = () => {
         setShowModal(false);
         setEditingEmployee(null);
+        setFormErrors({});
         setFormData({
             employeeId: '',
             name: '',
@@ -92,6 +157,10 @@ const EmployeeManager = ({ employees, onAdd, onEdit, onDelete }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        if (!validateForm()) {
+            return;
+        }
 
         if (editingEmployee) {
             onEdit(editingEmployee.id, formData);
@@ -254,6 +323,82 @@ const EmployeeManager = ({ employees, onAdd, onEdit, onDelete }) => {
                 </div>
             )}
 
+            {/* Failed Imports Section */}
+            {failedImports && failedImports.length > 0 && (
+                <div className="failed-imports-section">
+                    <div className="failed-imports-header">
+                        <div className="failed-imports-alert">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                            </svg>
+                            <div>
+                                <h4>Empleados con Errores de Importación</h4>
+                                <p>{failedImports.length} empleado(s) no se pudieron cargar correctamente</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="failed-imports-table-container">
+                        <table className="employees-table failed-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>CURP</th>
+                                    <th>Error</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {failedImports.map(failed => (
+                                    <tr key={failed.id} className="failed-row">
+                                        <td>{failed.employeeId || 'Sin ID'}</td>
+                                        <td>{failed.name || 'Sin nombre'}</td>
+                                        <td><code>{failed.curp || 'Sin CURP'}</code></td>
+                                        <td className="error-cell">
+                                            <span className="error-badge">{failed.error}</span>
+                                        </td>
+                                        <td>
+                                            <div className="action-buttons">
+                                                <button
+                                                    className="btn-icon btn-icon-success"
+                                                    onClick={() => {
+                                                        // Pre-fill form with failed data
+                                                        setFormData({
+                                                            employeeId: failed.employeeId || '',
+                                                            name: failed.name || '',
+                                                            curp: failed.curp || '',
+                                                            department: failed.department || '',
+                                                            area: failed.area || ''
+                                                        });
+                                                        setShowModal(true);
+                                                        if (onResolveFailed) onResolveFailed(failed.id);
+                                                    }}
+                                                    title="Usar estos datos"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                                    </svg>
+                                                </button>
+                                                <button
+                                                    className="btn-icon btn-icon-danger"
+                                                    onClick={() => onDismissFailed && onDismissFailed(failed.id)}
+                                                    title="Descartar"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
+
             {/* Modal */}
             <AnimatePresence>
                 {showModal && (
@@ -281,62 +426,95 @@ const EmployeeManager = ({ employees, onAdd, onEdit, onDelete }) => {
                             </div>
 
                             <form onSubmit={handleSubmit} className="modal-form">
-                                <div className="form-group">
+                                <div className={`form-group ${formErrors.employeeId ? 'has-error' : ''}`}>
                                     <label className="form-label">ID de Empleado *</label>
                                     <input
                                         type="text"
                                         className="form-input"
                                         value={formData.employeeId}
                                         onChange={(e) => setFormData({ ...formData, employeeId: e.target.value })}
-                                        required
+                                        placeholder="Ej: 3204"
                                         disabled={!!editingEmployee}
                                     />
+                                    {formErrors.employeeId && <span className="error-text">{formErrors.employeeId}</span>}
                                 </div>
 
-                                <div className="form-group">
+                                <div className={`form-group ${formErrors.name ? 'has-error' : ''}`}>
                                     <label className="form-label">Nombre Completo *</label>
                                     <input
                                         type="text"
                                         className="form-input"
                                         value={formData.name}
                                         onChange={(e) => setFormData({ ...formData, name: e.target.value.toUpperCase() })}
-                                        required
+                                        placeholder="NOMBRE APELLIDO APELLIDO"
                                     />
+                                    {formErrors.name && <span className="error-text">{formErrors.name}</span>}
                                 </div>
 
-                                <div className="form-group">
+                                <div className={`form-group ${formErrors.curp ? 'has-error' : ''}`}>
                                     <label className="form-label">CURP *</label>
                                     <input
                                         type="text"
                                         className="form-input"
                                         value={formData.curp}
                                         onChange={(e) => setFormData({ ...formData, curp: e.target.value.toUpperCase() })}
+                                        placeholder="AAAA000000HAAAAA00"
                                         maxLength="18"
-                                        required
                                     />
-                                    <small>18 caracteres</small>
+                                    <small>{formData.curp.length}/18 caracteres</small>
+                                    {formErrors.curp && <span className="error-text">{formErrors.curp}</span>}
                                 </div>
 
-                                <div className="form-group">
+                                <div className={`form-group ${formErrors.department ? 'has-error' : ''}`}>
                                     <label className="form-label">Departamento *</label>
-                                    <input
-                                        type="text"
-                                        className="form-input"
+                                    <select
+                                        className="form-input form-select"
                                         value={formData.department}
-                                        onChange={(e) => setFormData({ ...formData, department: e.target.value.toUpperCase() })}
-                                        required
-                                    />
+                                        onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                                    >
+                                        <option value="">Seleccionar departamento...</option>
+                                        {departments.map(dept => (
+                                            <option key={dept} value={dept}>{dept}</option>
+                                        ))}
+                                        <option value="__new__">+ Agregar nuevo departamento</option>
+                                    </select>
+                                    {formData.department === '__new__' && (
+                                        <input
+                                            type="text"
+                                            className="form-input"
+                                            style={{ marginTop: '0.5rem' }}
+                                            placeholder="Escribir nuevo departamento..."
+                                            onChange={(e) => setFormData({ ...formData, department: e.target.value.toUpperCase() })}
+                                            autoFocus
+                                        />
+                                    )}
+                                    {formErrors.department && <span className="error-text">{formErrors.department}</span>}
                                 </div>
 
-                                <div className="form-group">
+                                <div className={`form-group ${formErrors.area ? 'has-error' : ''}`}>
                                     <label className="form-label">Área *</label>
-                                    <input
-                                        type="text"
-                                        className="form-input"
+                                    <select
+                                        className="form-input form-select"
                                         value={formData.area}
-                                        onChange={(e) => setFormData({ ...formData, area: e.target.value.toUpperCase() })}
-                                        required
-                                    />
+                                        onChange={(e) => setFormData({ ...formData, area: e.target.value })}
+                                    >
+                                        <option value="">Seleccionar área...</option>
+                                        {areas.map(area => (
+                                            <option key={area} value={area}>{area}</option>
+                                        ))}
+                                        <option value="__new__">+ Agregar nueva área</option>
+                                    </select>
+                                    {formData.area === '__new__' && (
+                                        <input
+                                            type="text"
+                                            className="form-input"
+                                            style={{ marginTop: '0.5rem' }}
+                                            placeholder="Escribir nueva área..."
+                                            onChange={(e) => setFormData({ ...formData, area: e.target.value.toUpperCase() })}
+                                            autoFocus
+                                        />
+                                    )}
+                                    {formErrors.area && <span className="error-text">{formErrors.area}</span>}
                                 </div>
 
                                 <div className="modal-actions">

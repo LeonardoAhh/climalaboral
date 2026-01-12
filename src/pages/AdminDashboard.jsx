@@ -11,7 +11,7 @@ import ResponsesTable from '../components/admin/ResponsesTable';
 import QuestionEditor from '../components/admin/QuestionEditor';
 import EmployeeManager from '../components/admin/EmployeeManager';
 import DepartmentAnalytics from '../components/admin/DepartmentAnalytics';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import '../styles/pages/AdminDashboard.css';
@@ -23,6 +23,7 @@ const AdminDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('overview'); // overview, responses, questions, employees
     const [showExportMenu, setShowExportMenu] = useState(false);
+    const [failedImports, setFailedImports] = useState([]);
     const { signOut } = useAuth();
     const navigate = useNavigate();
 
@@ -62,6 +63,16 @@ const AdminDashboard = () => {
             }));
 
             setEmployees(employeesWithProgress);
+
+            // Load failed imports
+            const failedSnapshot = await getDocs(collection(db, 'failedImports'));
+            const failedData = failedSnapshot.docs
+                .map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }))
+                .filter(item => !item.resolved);
+            setFailedImports(failedData);
 
             // Load questions
             const questionsSnapshot = await getDocs(collection(db, 'surveyQuestions'));
@@ -149,6 +160,27 @@ const AdminDashboard = () => {
         }
     };
 
+    // Failed imports handlers
+    const handleResolveFailedImport = async (failedId) => {
+        try {
+            await updateDoc(doc(db, 'failedImports', failedId), { resolved: true });
+            setFailedImports(prev => prev.filter(item => item.id !== failedId));
+        } catch (error) {
+            console.error('Error resolving failed import:', error);
+        }
+    };
+
+    const handleDismissFailedImport = async (failedId) => {
+        if (window.confirm('¿Eliminar este registro de la lista de fallidos?')) {
+            try {
+                await deleteDoc(doc(db, 'failedImports', failedId));
+                setFailedImports(prev => prev.filter(item => item.id !== failedId));
+            } catch (error) {
+                console.error('Error dismissing failed import:', error);
+            }
+        }
+    };
+
     // Memoize expensive calculations
     const metrics = useMemo(() => {
         const totalEmployees = employees.length;
@@ -224,46 +256,91 @@ const AdminDashboard = () => {
         link.click();
     };
 
-    const exportToExcel = () => {
+    const exportToExcel = async () => {
         if (responses.length === 0) {
             alert('No hay datos para exportar');
             return;
         }
 
-        // Prepare data
+        // Create workbook and worksheet
+        const workbook = new ExcelJS.Workbook();
+        workbook.creator = 'Clima Laboral';
+        workbook.created = new Date();
+
+        const worksheet = workbook.addWorksheet('Resultados', {
+            properties: { tabColor: { argb: '1A6DA2' } }
+        });
+
+        // Prepare headers
         const headers = ['ID Empleado', 'Nombre', 'Fecha', 'Promedio General'];
         Object.keys(categoryInfo).forEach(cat => {
             headers.push(categoryInfo[cat].name);
         });
 
-        const data = responses.map(r => {
-            const row = [
+        // Add header row with styling
+        const headerRow = worksheet.addRow(headers);
+        headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+        headerRow.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FF1A6DA2' }
+        };
+        headerRow.alignment = { horizontal: 'center', vertical: 'middle' };
+        headerRow.height = 25;
+
+        // Add data rows with conditional formatting
+        responses.forEach(r => {
+            const rowData = [
                 r.employeeId,
                 r.employeeName,
                 new Date(r.submittedAt.seconds * 1000).toLocaleDateString('es-MX'),
                 r.overallScore
             ];
             Object.keys(categoryInfo).forEach(cat => {
-                row.push(r.categoryScores?.[cat] || 0);
+                rowData.push(r.categoryScores?.[cat] || 0);
             });
-            return row;
+
+            const row = worksheet.addRow(rowData);
+
+            // Apply conditional colors to score cells
+            for (let i = 4; i <= row.cellCount; i++) {
+                const cell = row.getCell(i);
+                const value = parseFloat(cell.value);
+                if (!isNaN(value)) {
+                    if (value >= 4.0) {
+                        cell.font = { color: { argb: 'FF16A34A' } }; // Green
+                    } else if (value >= 3.0) {
+                        cell.font = { color: { argb: 'FFEAB308' } }; // Yellow
+                    } else {
+                        cell.font = { color: { argb: 'FFDC2626' } }; // Red
+                    }
+                    cell.alignment = { horizontal: 'center' };
+                }
+            }
         });
 
-        // Create workbook
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
-
         // Set column widths
-        ws['!cols'] = [
-            { wch: 15 }, // ID
-            { wch: 30 }, // Nombre
-            { wch: 12 }, // Fecha
-            { wch: 18 }, // Promedio
-            ...Object.keys(categoryInfo).map(() => ({ wch: 20 }))
+        worksheet.columns = [
+            { width: 15 }, // ID
+            { width: 35 }, // Nombre
+            { width: 12 }, // Fecha
+            { width: 18 }, // Promedio
+            ...Object.keys(categoryInfo).map(() => ({ width: 20 }))
         ];
 
-        XLSX.utils.book_append_sheet(wb, ws, 'Resultados');
-        XLSX.writeFile(wb, `clima-laboral-${new Date().toISOString().split('T')[0]}.xlsx`);
+        // Auto filter
+        worksheet.autoFilter = {
+            from: 'A1',
+            to: String.fromCharCode(64 + headers.length) + '1'
+        };
+
+        // Generate and download
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `clima-laboral-${new Date().toISOString().split('T')[0]}.xlsx`;
+        link.click();
     };
 
     const exportToPDF = () => {
@@ -538,6 +615,9 @@ const AdminDashboard = () => {
                             onAdd={handleAddEmployee}
                             onEdit={handleEditEmployee}
                             onDelete={handleDeleteEmployee}
+                            failedImports={failedImports}
+                            onResolveFailed={handleResolveFailedImport}
+                            onDismissFailed={handleDismissFailedImport}
                         />
                     </motion.div>
                 )}

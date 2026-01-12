@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { categoryInfo } from '../../data/surveyQuestions';
 import '../../styles/components/QuestionEditor.css';
@@ -6,6 +6,13 @@ import '../../styles/components/QuestionEditor.css';
 const QuestionEditor = ({ questions, onSave }) => {
     const [editedQuestions, setEditedQuestions] = useState([...questions]);
     const [hasChanges, setHasChanges] = useState(false);
+
+    // Sync state when questions prop changes
+    useEffect(() => {
+        if (questions.length > 0 && editedQuestions.length === 0) {
+            setEditedQuestions([...questions]);
+        }
+    }, [questions]);
 
     const handleQuestionChange = (index, field, value) => {
         const updated = [...editedQuestions];

@@ -252,7 +252,7 @@ const Home = () => {
                                             id="admin-email"
                                             value={adminEmail}
                                             onChange={(e) => setAdminEmail(e.target.value)}
-                                            placeholder="correo@vinoplastic.com"
+                                            placeholder="•••••••"
                                             required
                                         />
                                     </div>
@@ -352,7 +352,7 @@ const Home = () => {
                                                     id="employee-id"
                                                     value={employeeId}
                                                     onChange={(e) => setEmployeeId(e.target.value)}
-                                                    placeholder="Ej: 3204"
+                                                    placeholder="Ej: 12345678"
                                                     required
                                                     autoFocus
                                                 />
